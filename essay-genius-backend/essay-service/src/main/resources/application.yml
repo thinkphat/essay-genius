@@ -81,3 +81,41 @@ openapi:
 gateway:
   domain: ${GATEWAY_DOMAIN:localhost}
   port: ${GATEWAY_PORT:9050}
+
+#_______________________________________MANAGEMENT_______________________________________
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+          - prometheus
+  endpoint:
+    health:
+      show-details: always
+
+  info:
+    git:
+      enabled: true
+      mode: full
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+    tags:
+      application: ${spring.application.name}
+
+  observations:
+    key-values:
+      application: ${spring.application.name}
+
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0

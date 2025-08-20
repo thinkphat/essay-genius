@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 2s
+  evaluation_interval: 2s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['essay-genius-prometheus:9090']
+
+  - job_name: 'GatewayService'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['localhost:9055']
+
+  - job_name: 'IdentityService'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['localhost:10000']
+
+  - job_name: 'EssayService'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: [ 'localhost:10002' ]
+
+  - job_name: 'InteractionService'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: [ 'localhost:10003' ]

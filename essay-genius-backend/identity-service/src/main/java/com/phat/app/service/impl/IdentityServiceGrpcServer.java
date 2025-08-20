@@ -52,22 +52,21 @@ public class IdentityServiceGrpcServer extends IdentityServiceGrpc.IdentityServi
                     .asRuntimeException());
         }
     }
+
     @Override
     public void getUserInfo(GetUserInfoRequest request,
-                                StreamObserver<GetUserInfoResponse> responseObserver) {
+                            StreamObserver<GetUserInfoResponse> responseObserver) {
 
         try {
-
-
             User user = userService.findById(request.getUserId());
             GetUserInfoResponse.Builder responseBuilder = GetUserInfoResponse.newBuilder()
                     .setUserId(user.getId())
-                    .setEmail(user.getEmail())
-                    .setFirstName(user.getFirstName())
-                    .setLastName(user.getLastName())
-                    .setBio(user.getBio());
+                    .setEmail(user.getEmail() != null ? user.getEmail() : "")
+                    .setFirstName(user.getFirstName() != null ? user.getFirstName() : "")
+                    .setLastName(user.getLastName() != null ? user.getLastName() : "")
+                    .setBio(user.getBio() != null ? user.getBio() : "");
 
-            String url = minioClientService.getObjectUrl("default-avatar-url.png" , "user-avatars");
+            String url = minioClientService.getObjectUrl("default-avatar-url.png", "user-avatars");
             try {
                 url = minioClientService.getObjectUrl(user.getAvatar(), "user-avatars");
                 log.debug("Avatar URL retrieved: {}", url);
@@ -85,6 +84,7 @@ public class IdentityServiceGrpcServer extends IdentityServiceGrpc.IdentityServi
             return;
         }
     }
+
     @Override
     public void getUserIds(Empty request, StreamObserver<GetUserIdsResponse> responseObserver) {
         List<String> userIds = userRepository.findAll()

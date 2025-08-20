@@ -3,6 +3,7 @@ package com.phat.domain.irepository;
 import com.phat.domain.model.Reaction;
 import com.phat.domain.model.ReactionType;
 import com.phat.domain.model.TargetType;
+import io.micrometer.observation.annotation.Observed;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Observed
 public interface ReactionRepository extends MongoRepository<Reaction, String> {
     List<Reaction> findByTargetId(String essayId, String commentId);
 

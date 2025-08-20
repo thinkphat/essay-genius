@@ -7,10 +7,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import {
-  signInBodySchema,
-  SignInBodySchema,
-} from "@/lib/schemas/auth.schema";
+import { signInBodySchema, SignInBodySchema } from "@/lib/schemas/auth.schema";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +31,6 @@ import { z } from "zod";
 import { api } from "@/lib/api";
 import { setCookie } from "cookies-next/client";
 import { COOKIE_KEY_ACCESS_TOKEN, COOKIE_KEY_REFRESH_TOKEN } from "@/constants";
-
 
 type FormValues = z.infer<typeof signInBodySchema>;
 
@@ -68,7 +64,7 @@ export default function SignIn() {
           setCookie(COOKIE_KEY_REFRESH_TOKEN, refreshToken, {
             httpOnly: false,
           });
-          await queryClient.invalidateQueries({ queryKey: ['current_user'] });
+          await queryClient.invalidateQueries({ queryKey: ["current_user"] });
           toast("Login successful");
           router.push("/");
           break;
@@ -106,7 +102,9 @@ export default function SignIn() {
 
   // Focus email on load
   useEffect(() => {
-    const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement;
+    const emailInput = document.querySelector(
+      'input[name="email"]',
+    ) as HTMLInputElement;
     emailInput?.focus();
   }, []);
 
@@ -114,7 +112,9 @@ export default function SignIn() {
     <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Sign In
+          </CardTitle>
           <CardDescription className="text-center">
             Enter your email and password to sign in to your account
           </CardDescription>
@@ -148,7 +148,10 @@ export default function SignIn() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                      <Link
+                        href="/forgot-password"
+                        className="text-sm text-primary hover:underline"
+                      >
                         Forgot password?
                       </Link>
                     </div>
@@ -164,7 +167,11 @@ export default function SignIn() {
                   {form.formState.errors.root.message}
                 </p>
               )}
-              <Button type="submit" className="w-full" disabled={mutation.isPending}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={mutation.isPending}
+              >
                 {mutation.isPending ? "Signing in..." : "Sign In"}
               </Button>
             </form>
@@ -183,4 +190,3 @@ export default function SignIn() {
     </div>
   );
 }
-

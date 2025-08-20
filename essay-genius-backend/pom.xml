@@ -34,6 +34,9 @@
         <mapstruct.version>1.6.0</mapstruct.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
         <jedis.version>5.2.0</jedis.version>
+        <loki.version>1.5.2</loki.version>
+        <datasource-micrometer.version>1.1.1</datasource-micrometer.version>
+        <logback.version>1.5.18</logback.version>
         <!-- GRPC -->
         <spring-grpc.version>3.1.0.RELEASE</spring-grpc.version>
         <protobuf-plugin.version>0.6.1</protobuf-plugin.version>
@@ -53,6 +56,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -78,6 +82,16 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
         </dependency>
     </dependencies>
 

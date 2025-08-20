@@ -115,6 +115,7 @@ services:
     networks:
       - essay-genius-network
     restart: unless-stopped
+
   minio:
     image: minio/minio:RELEASE.2024-08-17T01-24-54Z.fips
     container_name: essay-genius-minio
@@ -127,6 +128,69 @@ services:
       MINIO_ROOT_USER: minioadmin # Thay đổi tên người dùng mặc định
       MINIO_ROOT_PASSWORD: minioadmin # Thay đổi mật khẩu mặc định
     command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  #LOKI
+  essay-genius-loki:
+    image: grafana/loki:main
+    container_name: essay-genius-loki
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    ports:
+      - "3100:3100"
+    networks:
+      - essay-genius-network
+    restart: unless-stopped
+
+  #  PROMETHEUS
+  essay-genius-prometheus:
+    image: prom/prometheus:main
+    container_name: essay-genius-prometheus
+    command:
+      - --enable-feature=exemplar-storage
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./docker/grafana-stack/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - essay-genius-network
+    restart: unless-stopped
+
+  #  TEMPO
+  essay-genius-tempo:
+    image: grafana/tempo:main-bbe0435
+    container_name: essay-genius-tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./docker/grafana-stack/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - ./docker/grafana-stack/tempo/tempo-data:/tmp/tempo
+    ports:
+      - "3110:3100" # Tempo
+      - "9411:9411" # zipkin
+      - "4317:4317" # OTel
+    networks:
+      - essay-genius-network
+    restart: unless-stopped
+
+  #  GRAFANA
+  essay-genius-grafana:
+    image: grafana/grafana:10.1.0
+    container_name: essay-genius-grafana
+    environment:
+      #      GF_AUTH_ANONYMOUS_ENABLED: true
+      #      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      #      GF_AUTH_DISABLE_LOGIN_FORM: true
+      GF_SECURITY_ADMIN_USER: eternity_user
+      GF_SECURITY_ADMIN_PASSWORD: a_will_eternal
+    volumes:
+      #      - ./docker/grafana-stack/grafana:/etc/grafana/provisioning/datasources:ro
+      - ./docker/grafana-stack/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./docker/grafana-stack/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    #      - ./docker/grafana-stack/grafana/grafana.ini:/etc/grafana/grafana.ini
+    ports:
+      - "3000:3000"
+    networks:
+      - essay-genius-network
     restart: unless-stopped
 
 networks:
