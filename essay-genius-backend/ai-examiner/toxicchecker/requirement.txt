@@ -3,3 +3,7 @@ datasets
 scikit-learn
 pandas
 torch
+grpcio
+grpcio-tools
+google-genai
+dotenv

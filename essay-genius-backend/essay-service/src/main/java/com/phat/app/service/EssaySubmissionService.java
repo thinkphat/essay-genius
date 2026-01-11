@@ -17,5 +17,4 @@ public interface EssaySubmissionService {
     EssaySubmission findEssayById(String id) throws Exception;
 
     Page<EssayScoredResponse> findAllEssays(ListEssayRequest listEssayRequest) throws Exception;
-
 }

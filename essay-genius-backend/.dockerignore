@@ -1,0 +1,45 @@
+# ===== VCS =====
+.git
+.gitignore
+
+# ===== Maven =====
+**/target
+**/*.log
+
+# ===== Node =====
+**/node_modules
+**/dist
+**/.npm
+
+# ===== Python =====
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.venv
+**/venv
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== IDE =====
+.idea
+.vscode
+*.iml
+
+# ===== Docker =====
+docker/*
+docker-compose*.yml
+
+# ===== Secrets =====
+.env
+env.properties
+*.key
+*.pem
+
+# ===== AI / Large files =====
+**/*.pt
+**/*.bin
+**/*.onnx
+**/data
