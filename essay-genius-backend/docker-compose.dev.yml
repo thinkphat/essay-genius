@@ -12,19 +12,19 @@ services:
       - essay-genius-identity-service-postgres-data:/var/lib/postgresql/data
       - ./postgres/identity-service-postgres-init-db:/docker-entrypoint-initdb.d
     ports:
-      - '5432:5432'
+      - "5432:5432"
     networks:
       - essay-genius-network
 
   # PGADMIN
   identity-service-pgadmin:
     image: elestio/pgadmin:latest
-    depends_on: [ identity-service-postgres ]
+    depends_on: [identity-service-postgres]
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5050:80"
     volumes:
@@ -46,18 +46,16 @@ services:
 
   # KAFKA BROKER
   essay-genius-kafka-broker:
-    image: confluentinc/cp-kafka:7.7.7
+    image: apache/kafka:4.0.1
     container_name: essay-genius-kafka-broker
-    hostname: kafka
     environment:
-      - KAFKA_ENABLE_KRAFT=yes
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_NODE_ID=1
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
     volumes:
       - ./docker/kafka/certs:/bitnami/kafka/config/certs
       - essay-genius-kafka-broker-data:/var/lib/kafka/data
@@ -86,8 +84,7 @@ services:
   essay-service-mongo-express:
     image: mongo-express:1.0.2-20-alpine3.19
     container_name: essay-service-mongo-express
-    depends_on:
-      [ essay-service-mongodb ]
+    depends_on: [essay-service-mongodb]
     environment:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
       ME_CONFIG_MONGODB_ADMINUSERNAME: eternity_user
@@ -131,9 +128,9 @@ services:
 
   #LOKI
   essay-genius-loki:
-    image: grafana/loki:main
+    image: grafana/loki:2.9.6
     container_name: essay-genius-loki
-    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    command: -config.file=/etc/loki/local-config.yaml
     ports:
       - "3100:3100"
     networks:
@@ -159,7 +156,7 @@ services:
   essay-genius-tempo:
     image: grafana/tempo:main-bbe0435
     container_name: essay-genius-tempo
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./docker/grafana-stack/tempo/tempo.yml:/etc/tempo.yaml:ro
       - ./docker/grafana-stack/tempo/tempo-data:/tmp/tempo
