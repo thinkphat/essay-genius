@@ -1,9 +1,10 @@
 # ===== BUILD STAGE =====
 FROM maven:3.9.12-eclipse-temurin-21 AS builder
-WORKDIR /build
+WORKDIR /app
 
-COPY discovery-server/pom.xml discovery-server/pom.xml
-COPY discovery-server/src discovery-server/src
+COPY pom.xml pom.xml
+
+COPY src src
 
 RUN --mount=type=cache,target=/root/.m2 \
     mvn dependency:go-offline
@@ -13,11 +14,10 @@ RUN --mount=type=cache,target=/root/.m2 \
 
 # ===== RUNTIME STAGE =====
 FROM eclipse-temurin:21-jre-alpine-3.23
-WORKDIR /run
+WORKDIR /app
 
-COPY --from=builder /build/discovery-server/target/discovery-server-*.jar discovery-server.jar
+COPY --from=builder /app/target/gateway-*.jar gateway.jar
 
-EXPOSE 8761
+EXPOSE 9050
 
-ENTRYPOINT ["java","-jar","/run/discovery-server.jar"]
-
+ENTRYPOINT ["java","-jar","/app/gateway.jar"]

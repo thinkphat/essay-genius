@@ -1,0 +1,20 @@
+# ===== BUILD STAGE =====
+FROM maven:3.9.12-eclipse-temurin-21 AS builder
+WORKDIR /build
+
+COPY common-library/pom.xml common-library/pom.xml
+COPY common-library/src common-library/src
+RUN --mount=type=cache,target=/root/.m2 mvn -f common-library/pom.xml clean install -DskipTests
+
+COPY essay-service/pom.xml essay-service/pom.xml
+COPY essay-service/src essay-service/src
+RUN --mount=type=cache,target=/root/.m2 mvn -f essay-service/pom.xml clean package -DskipTests
+
+# ===== RUNTIME STAGE =====
+FROM eclipse-temurin:21-jre-alpine-3.23
+WORKDIR /app
+
+COPY --from=builder /build/essay-service/target/*jar essay-service.jar
+
+EXPOSE 10002
+ENTRYPOINT ["java","-jar","/app/essay-service.jar"]

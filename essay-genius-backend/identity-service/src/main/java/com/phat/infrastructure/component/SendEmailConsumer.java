@@ -42,7 +42,7 @@ public class SendEmailConsumer {
         String code = message.split(":")[3];
         String languageCode = message.split(":")[4];
 
-        LocaleContextHolder.setLocale(Locale.of(languageCode));
+        LocaleContextHolder.setLocale(Locale.forLanguageTag(languageCode));
         log.info("[{}]: Message received: {}", MICROSERVICE_NAME, message);
 
         try {

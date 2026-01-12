@@ -3,13 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.phat</groupId>
-        <artifactId>essay-genius-backend</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-
+    <groupId>com.phat</groupId>
     <artifactId>common-library</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.3</version>
+        <relativePath/>
+    </parent>
 
     <properties>
         <avro-maven-plugin.version>1.8.2</avro-maven-plugin.version>
@@ -19,6 +23,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <openapi.version>2.8.5</openapi.version>
         <datafaker.version>2.4.2</datafaker.version>
+
+        <java.version>21</java.version>
+
+        <spring-grpc.version>3.1.0.RELEASE</spring-grpc.version>
+        <loki.version>1.5.1</loki.version>
+        <datasource-micrometer.version>1.0.4</datasource-micrometer.version>
+        <protobuf-plugin.version>0.6.1</protobuf-plugin.version>
+        <io.grpc.version>1.62.2</io.grpc.version>
+
+        <openapi.version>2.8.5</openapi.version>
+        <datafaker.version>2.4.2</datafaker.version>
+        <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
     </properties>
     <repositories>
         <repository>
@@ -27,6 +43,10 @@
         </repository>
     </repositories>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
@@ -46,6 +66,11 @@
             <groupId>net.devh</groupId>
             <artifactId>grpc-spring-boot-starter</artifactId>
             <version>${spring-grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- https://mvnrepository.com/artifact/net.datafaker/datafaker -->
         <dependency>
@@ -76,15 +101,7 @@
             <groupId>io.zipkin.reporter2</groupId>
             <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>net.devh</groupId>-->
-        <!--            <artifactId>grpc-client-spring-boot-starter</artifactId>-->
-        <!--            <version>${spring-grpc.version}</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-services</artifactId>-->
-        <!--        </dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
@@ -112,6 +129,7 @@
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
