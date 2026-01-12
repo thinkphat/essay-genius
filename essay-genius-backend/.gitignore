@@ -68,4 +68,14 @@ replay_pid*
 env.properties
 .env
 
+# Grafana Tempo
+tempo-data/
+**/tempo-data/
 
+# Tempo runtime files
+**/tempo/wal/
+**/tempo/blocks/
+**/tempo/traces/
+
+# Logs (nếu có)
+*.log

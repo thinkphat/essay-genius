@@ -117,12 +117,12 @@ services:
     container_name: essay-genius-minio
     ports:
       - "9000:9000"
-      - "9001:9001" # Mở port này để truy cập Minio Console
+      - "9001:9001"
     volumes:
-      - essay-genius-minio-data:/data # Tạo volume để lưu trữ dữ liệu
+      - essay-genius-minio-data:/data
     environment:
-      MINIO_ROOT_USER: minioadmin # Thay đổi tên người dùng mặc định
-      MINIO_ROOT_PASSWORD: minioadmin # Thay đổi mật khẩu mặc định
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
     restart: unless-stopped
 
