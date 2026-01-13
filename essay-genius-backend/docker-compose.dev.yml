@@ -63,7 +63,7 @@ services:
       # Optional: allow auto topic creation if needed
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
     volumes:
-      - ./docker/kafka/certs:/bitnami/kafka/config/certs   # If have certs
+      - ./docker/kafka/certs:/bitnami/kafka/config/certs # If have certs
       - eg-kafka-broker-data:/var/lib/kafka/data
     ports:
       - "9094:9092"
@@ -127,8 +127,8 @@ services:
     volumes:
       - eg-minio-data:/data
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
     restart: unless-stopped
 
@@ -207,3 +207,4 @@ volumes:
   eg-essay-service-mongodb-data:
   eg-interaction-service-mongodb-data:
   eg-minio-data:
+

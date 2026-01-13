@@ -1,5 +1,5 @@
 server:
-  port: ${DISCOVERY_PORT:8761}
+  port: ${DISCOVERY_SERVER_PORT:8761}
 spring:
   application:
     name: discovery-server
