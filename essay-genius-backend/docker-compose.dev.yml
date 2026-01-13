@@ -20,6 +20,7 @@ services:
   # PGADMIN
   eg-identity-service-pgadmin:
     image: elestio/pgadmin:latest
+    container_name: eg-identity-service-pgadmin
     depends_on: [eg-identity-service-postgres]
     restart: unless-stopped
     environment:

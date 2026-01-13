@@ -50,6 +50,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private String[] publicEndpoints = {
             "/identity",
             "/identity/sign-up",
+            "/identity/mock/init",
             "/identity/verify-email-by-code",
             "/identity/verify-email-by-token",
             "/identity/send-email-verification",

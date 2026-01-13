@@ -1,5 +1,5 @@
 server:
-  port: 10000
+  port: ${IDENTITY_SERVICE_PORT:10000}
   servlet:
     context-path: /identity
 
@@ -11,7 +11,7 @@ spring:
     name: identity-service
   #_______________________________________DATABASE_______________________________________
   datasource:
-    url: jdbc:postgresql://localhost:5432/identity_service_db
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/identity_service_db
     username: ${POSTGRES_USER:eternity_user}
     password: ${POSTGRES_PASSWORD:a_will_eternal}
     driver-class-name: org.postgresql.Driver
@@ -34,7 +34,7 @@ spring:
     default-locale: en
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_HOST:localhost}:${KAFKA_BOOTSTRAP_PORT}
     identity-consumer:
       group-id: identity-service
       auto-offset-reset: earliest
@@ -48,7 +48,7 @@ spring:
     from: ${FROM_MAIL}
     host: smtp.gmail.com
     port: 587
-    verify-link: ${VERIFY_LINK:http://localhost:9000/identity/auth/verify-email-by-token}
+    verify-link: ${VERIFY_LINK:http://${GATEWAY_HOST:localhost}:${GATEWAY_PORT:9050}/identity/auth/verify-email-by-token}
     username: ${FROM_MAIL}
     password: ${SMTP_PASSWORD}
     default-encoding: UTF-8
@@ -62,24 +62,24 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+      defaultZone: ${EUREKA_URL:http://${EUREKA_HOST}:${EUREKA_PORT}/eureka}
   instance:
     prefer-ip-address: true
 
 grpc:
   server:
-    port: 9083
+    port: ${GRPC_IDENTITY_SERVICE_PORT:9083}
     negotiationType: plaintext
     enableReflection: true
     maxInboundMessageSize: 104857600 # 100MB
     maxInboundMetadataSize: 1048576 # 1MB
   client:
     essay-service:
-      address: static://localhost:9082
+      address: static://${GRPC_ESSAY_SERVICE_HOST:localhost}:${GRPC_ESSAY_SERVICE_PORT:9082}
       negotiationType: plaintext
 
     interaction-service:
-      address: static://localhost:9084
+      address: static://${GRPC_INTERACTION_SERVICE_HOST:localhost}:${GRPC_INTERACTION_SERVICE_PORT:9084}
       negotiationType: plaintext
 
 #logging:
@@ -103,7 +103,7 @@ springdoc:
   show-actuator: true
 
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://${MINIO_HOST:localhost}:${MINIO_PORT:9000}
   access-key: minioadmin
   secret-key: minioadmin
   bucket-name: essay-genius-bucket
