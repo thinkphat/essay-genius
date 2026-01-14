@@ -12,15 +12,15 @@ grpc:
     maxInboundMetadataSize: 1048576 # 1MB
   client:
     ai-service:
-      address: static://localhost:9081
+      address: static://${GRPC_AI_SERVICE_HOST}:${GRPC_AI_SERVICE_PORT}
       negotiationType: plaintext
 
     identity-service:
-      address: static://localhost:9083
+      address: static://${GRPC_IDENTITY_SERVICE_HOST}:${GRPC_IDENTITY_SERVICE_PORT}
       negotiationType: plaintext
 
     interaction-service:
-      address: static://localhost:9084
+      address: static://${GRPC_INTERACTION_SERVICE_HOST}:${GRPC_INTERACTION_SERVICE_PORT}
       negotiationType: plaintext
 
 jwt:
@@ -42,9 +42,9 @@ spring:
     default-locale: en
   data:
     mongodb:
-      username: eternity_user
-      password: a_will_eternal
-      host: localhost
+      username: ${MONGODB_USERNAME}
+      password: ${MONGODB_PASSWORD}
+      host: ${MONGODB_HOST}
 #      uri: mongodb://eternity_user:a_will_eternal@essay-service-mongodb:27017/essaydb?authSource=admin
       database: essaydb
       authentication-database: admin
@@ -52,7 +52,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+      defaultZone: ${DISCOVERY_SERVER_URL}
   instance:
     prefer-ip-address: true
 
@@ -79,8 +79,8 @@ openapi:
     server-description: Essay Genius Backend API service For Development
 
 gateway:
-  domain: ${GATEWAY_DOMAIN:localhost}
-  port: ${GATEWAY_PORT:9050}
+  domain: ${GATEWAY_HOST}
+  port: ${GATEWAY_PORT}
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

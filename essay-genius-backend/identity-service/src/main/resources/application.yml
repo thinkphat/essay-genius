@@ -1,19 +1,20 @@
 server:
-  port: ${IDENTITY_SERVICE_PORT:10000}
+  port: ${IDENTITY_SERVICE_PORT}
   servlet:
     context-path: /identity
 
 spring:
   config:
     import:
-      - "file:env.properties"
+      - "optional:file:env.properties"
+      - "optional:file:../env.properties"
   application:
     name: identity-service
   #_______________________________________DATABASE_______________________________________
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/identity_service_db
-    username: ${POSTGRES_USER:eternity_user}
-    password: ${POSTGRES_PASSWORD:a_will_eternal}
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/identity_service_db
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -34,7 +35,7 @@ spring:
     default-locale: en
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_HOST:localhost}:${KAFKA_BOOTSTRAP_PORT}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_HOST}:${KAFKA_BOOTSTRAP_PORT}
     identity-consumer:
       group-id: identity-service
       auto-offset-reset: earliest
@@ -48,7 +49,7 @@ spring:
     from: ${FROM_MAIL}
     host: smtp.gmail.com
     port: 587
-    verify-link: ${VERIFY_LINK:http://${GATEWAY_HOST:localhost}:${GATEWAY_PORT:9050}/identity/auth/verify-email-by-token}
+    verify-link: ${VERIFY_LINK:http://${GATEWAY_HOST}:${GATEWAY_PORT}/identity/auth/verify-email-by-token}
     username: ${FROM_MAIL}
     password: ${SMTP_PASSWORD}
     default-encoding: UTF-8
@@ -62,24 +63,24 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:http://${DISCOVERY_SERVER_HOST:localhost}:${DISCOVERY_SERVER_PORT:8761}/eureka}
+      defaultZone: ${DISCOVERY_SERVER_URL}
   instance:
     prefer-ip-address: true
 
 grpc:
   server:
-    port: ${GRPC_IDENTITY_SERVICE_PORT:9083}
+    port: ${GRPC_IDENTITY_SERVICE_PORT}
     negotiationType: plaintext
     enableReflection: true
     maxInboundMessageSize: 104857600 # 100MB
     maxInboundMetadataSize: 1048576 # 1MB
   client:
     essay-service:
-      address: static://${GRPC_ESSAY_SERVICE_HOST:localhost}:${GRPC_ESSAY_SERVICE_PORT:9082}
+      address: static://${GRPC_ESSAY_SERVICE_HOST}:${GRPC_ESSAY_SERVICE_PORT}
       negotiationType: plaintext
 
     interaction-service:
-      address: static://${GRPC_INTERACTION_SERVICE_HOST:localhost}:${GRPC_INTERACTION_SERVICE_PORT:9084}
+      address: static://${GRPC_INTERACTION_SERVICE_HOST}:${GRPC_INTERACTION_SERVICE_PORT}
       negotiationType: plaintext
 
 #logging:
@@ -103,9 +104,9 @@ springdoc:
   show-actuator: true
 
 minio:
-  endpoint: http://${MINIO_HOST:localhost}:${MINIO_PORT:9000}
-  access-key: minioadmin
-  secret-key: minioadmin
+  endpoint: http://${MINIO_HOST}:${MINIO_PORT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
   bucket-name: essay-genius-bucket
   temp-bucket-name: essay-genius-temp-bucket
 
@@ -115,12 +116,12 @@ openapi:
     title: Identity Service REST API
     description: This is the API documentation for Identity Service.
     version: 1.0.0
-    server-url: http://localhost:${server.port}${server.servlet.context-path}
+    server-url: http://${IDENTITY_SERVICE_HOST:localhost}:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
 
 gateway:
-  domain: ${GATEWAY_DOMAIN:localhost}
-  port: ${GATEWAY_PORT:9050}
+  domain: ${GATEWAY_HOST}
+  port: ${GATEWAY_PORT}
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

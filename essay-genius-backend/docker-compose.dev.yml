@@ -1,19 +1,96 @@
+version: "3.7"
 services:
+  eg-discovery:
+    image: eg-discovery-server:${APPLICATION_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.discoveryserver
+    container_name: eg-discovery-server
+    ports:
+      - "8761:8761"
+    env_file:
+      - .env
+    networks:
+      - eg-network
+
+  eg-gateway:
+    image: eg-gateway:${APPLICATION_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: eg-gateway
+    ports:
+      - "9050:9050"
+    env_file:
+      - .env
+    networks:
+      - eg-network
+
+  eg-essay:
+    image: eg-essay-service:${APPLICATION_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.essayservice
+    container_name: eg-essay-service
+    ports:
+      - "10002:10002"
+    env_file:
+      - .env
+      - env.properties
+    networks:
+      - eg-network
+
+  eg-interaction:
+    image: eg-interaction-service:${APPLICATION_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.interactionservice
+    container_name: eg-interaction-service
+    ports:
+      - "10003:10003"
+    env_file:
+      - .env
+      - env.properties
+    networks:
+      - eg-network
+
   # POSTGRES
   eg-identity-service-postgres:
-    image: postgres:${SOFTWARE_VERSION_TAG}
+    image: postgres:${POSTGRES_VERSION}
     container_name: eg-identity-service-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: eternity_user
-      POSTGRES_PASSWORD: a_will_eternal
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data
       POSTGRES_DB: identity_service_db
+    env_file:
+      - .env
     volumes:
       - eg-identity-service-postgres-data:/var/lib/postgresql/data
       - ./postgres/identity-service-postgres-init-db:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    networks:
+      - eg-network
+
+  eg-identity:
+    image: eg-identity-service:${APPLICATION_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.identityservice
+    container_name: eg-identity-service
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on: [ eg-identity-service-postgres ]
+    ports:
+      - "10000:10000"
+    env_file:
+      - .env
+      - env.properties
     networks:
       - eg-network
 
@@ -24,8 +101,8 @@ services:
     depends_on: [eg-identity-service-postgres]
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5050:80"
@@ -76,10 +153,12 @@ services:
     image: mongo:latest
     container_name: eg-essay-service-mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: eternity_user
-      MONGO_INITDB_ROOT_PASSWORD: a_will_eternal
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
     volumes:
       - eg-essay-service-mongodb-data:/data/db
+    env_file:
+      - .env
     ports:
       - "27017:27017"
     networks:
@@ -92,12 +171,14 @@ services:
     container_name: eg-essay-service-mongo-express
     depends_on: [eg-essay-service-mongodb]
     environment:
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-      ME_CONFIG_MONGODB_ADMINUSERNAME: eternity_user
-      ME_CONFIG_MONGODB_ADMINPASSWORD: a_will_eternal
-      ME_CONFIG_MONGODB_SERVER: essay-service-mongodb
-      ME_CONFIG_BASICAUTH_USERNAME: root
-      ME_CONFIG_BASICAUTH_PASSWORD: root
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_EXPRESS_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_EXPRESS_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: ${MONGODB_HOST}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_ROOT_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_ROOT_PASSWORD}
+    env_file:
+      - .env
     ports:
       - "5051:8081"
     networks:
@@ -108,8 +189,10 @@ services:
     image: mongo:latest
     container_name: eg-interaction-service-mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: eternity_user
-      MONGO_INITDB_ROOT_PASSWORD: a_will_eternal
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+    env_file:
+      - .env
     volumes:
       - eg-interaction-service-mongodb-data:/data/db
     ports:
@@ -129,6 +212,8 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    env_file:
+      - .env
     command: server /data --console-address ":9001"
     restart: unless-stopped
 
@@ -182,8 +267,10 @@ services:
       #      GF_AUTH_ANONYMOUS_ENABLED: true
       #      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
       #      GF_AUTH_DISABLE_LOGIN_FORM: true
-      GF_SECURITY_ADMIN_USER: eternity_user
-      GF_SECURITY_ADMIN_PASSWORD: a_will_eternal
+      GF_SECURITY_ADMIN_USER: ${GF_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD}
+    env_file:
+      - .env
     volumes:
       #      - ./docker/grafana-stack/grafana:/etc/grafana/provisioning/datasources:ro
       - ./docker/grafana-stack/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
@@ -200,6 +287,12 @@ networks:
     driver: bridge
 
 volumes:
+  eg-discovery:
+  eg-gateway:
+  eg-essay:
+  eg-identity:
+  eg-interaction:
+
   eg-identity-service-postgres-data:
   eg-identity-service-pgadmin-data:
   eg-identity-service-redis-data:
@@ -207,4 +300,3 @@ volumes:
   eg-essay-service-mongodb-data:
   eg-interaction-service-mongodb-data:
   eg-minio-data:
-
