@@ -17,5 +17,5 @@ WORKDIR /app
 
 COPY --from=builder /build/discovery-server/target/*.jar discovery-server.jar
 
-EXPOSE 8761
+#EXPOSE 8761
 ENTRYPOINT ["java","-jar","/app/discovery-server.jar"]

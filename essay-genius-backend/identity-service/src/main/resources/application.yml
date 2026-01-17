@@ -49,7 +49,7 @@ spring:
     from: ${FROM_MAIL}
     host: smtp.gmail.com
     port: 587
-    verify-link: ${VERIFY_LINK:http://${GATEWAY_HOST}:${GATEWAY_PORT}/identity/auth/verify-email-by-token}
+    verify-link: https://${API_DOMAIN}/identity/auth/verify-email-by-token
     username: ${FROM_MAIL}
     password: ${SMTP_PASSWORD}
     default-encoding: UTF-8
@@ -116,7 +116,7 @@ openapi:
     title: Identity Service REST API
     description: This is the API documentation for Identity Service.
     version: 1.0.0
-    server-url: http://${IDENTITY_SERVICE_HOST:localhost}:${server.port}${server.servlet.context-path}
+#    server-url: http://${IDENTITY_SERVICE_HOST:localhost}:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
 
 #_______________________________________MANAGEMENT_______________________________________

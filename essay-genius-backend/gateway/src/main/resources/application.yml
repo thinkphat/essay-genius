@@ -1,5 +1,4 @@
 server:
-  address: 0.0.0.0
   port: ${GATEWAY_PORT}
   forward-headers-strategy: framework
 
@@ -27,8 +26,8 @@ spring:
             allowedHeaders: "Authorization,Content-Type,Accept-Language,No-Auth"
             allowCredentials: true
       routes:
-        - id: identity-service
-          uri: lb://IDENTITY-SERVICE
+        - id: identity
+          uri: http://identity-service
           predicates:
             - Path=/identity/**
         - id: essay-service
