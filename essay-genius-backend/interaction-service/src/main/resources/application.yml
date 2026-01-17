@@ -54,7 +54,7 @@ eureka:
     service-url:
       defaultZone: ${DISCOVERY_SERVER_URL}
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
 
 #logging:
 #  level:

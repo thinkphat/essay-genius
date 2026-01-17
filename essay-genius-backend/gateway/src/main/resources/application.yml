@@ -1,11 +1,17 @@
 server:
+  address: 0.0.0.0
   port: ${GATEWAY_PORT}
+  forward-headers-strategy: framework
 
 springdoc:
   swagger-ui:
     path: /swagger-ui
 
 spring:
+  config:
+    import:
+      - "optional:file:env.properties"
+      - "optional:file:../env.properties"
   application:
     name: gateway
   cloud:
@@ -54,7 +60,7 @@ eureka:
     service-url:
       defaultZone: ${DISCOVERY_SERVER_URL}
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

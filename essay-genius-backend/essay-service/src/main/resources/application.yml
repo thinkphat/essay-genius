@@ -54,7 +54,7 @@ eureka:
     service-url:
       defaultZone: ${DISCOVERY_SERVER_URL}
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
 
 #logging:
 #  level:
@@ -77,10 +77,6 @@ openapi:
     version: 1.0.0
     server-url: http://localhost:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
-
-gateway:
-  domain: ${GATEWAY_HOST}
-  port: ${GATEWAY_PORT}
 
 #_______________________________________MANAGEMENT_______________________________________
 management:
