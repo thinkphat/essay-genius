@@ -60,12 +60,12 @@ spring:
           starttls:
             enable: true
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${DISCOVERY_SERVER_URL}
-  instance:
-    prefer-ip-address: false
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: ${DISCOVERY_SERVER_URL}
+#  instance:
+#    prefer-ip-address: false
 
 grpc:
   server:

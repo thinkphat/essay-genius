@@ -6,8 +6,8 @@ COPY gateway/pom.xml gateway/pom.xml
 
 COPY gateway/src gateway/src
 
-RUN --mount=type=cache,target=/root/.m2 \
-    mvn -f gateway/pom.xml dependency:go-offline
+# RUN --mount=type=cache,target=/root/.m2 \
+#     mvn -f gateway/pom.xml dependency:go-offline
 
 RUN --mount=type=cache,target=/root/.m2 \
     mvn -f gateway/pom.xml clean package -DskipTests
