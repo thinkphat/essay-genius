@@ -1,7 +1,11 @@
 server:
-  port: ${GATEWAY_PORT}
+  port: 9050
 
 springdoc:
+  config:
+    import:
+      - "optional:file:env.properties"
+      - "optional:file:../env.properties"
   swagger-ui:
     path: /swagger-ui
 
@@ -52,7 +56,7 @@ logging:
 eureka:
   client:
     service-url:
-      defaultZone: ${DISCOVERY_SERVER_URL}
+      defaultZone: ${DISCOVERY_SERVER_URL:http://localhost:8761/eureka}
   instance:
     prefer-ip-address: true
 

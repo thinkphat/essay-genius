@@ -1,8 +1,4 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  isAxiosError
-} from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse, isAxiosError } from "axios";
 import {
   QueryClient,
   defaultShouldDehydrateQuery,
@@ -60,11 +56,14 @@ export const restClient = {
     params?: TQueryParams,
     config?: AxiosRequestConfig<TQueryParams>,
   ): Promise<AxiosResponse<TResponse, TQueryParams>> => {
-    return axiosClient.get<TResponse, AxiosResponse<TResponse, TQueryParams>>(url, {
-      params,
-      paramsSerializer: (params) => qs.stringify(params),
-      ...config,
-    });
+    return axiosClient.get<TResponse, AxiosResponse<TResponse, TQueryParams>>(
+      url,
+      {
+        params,
+        paramsSerializer: (params) => qs.stringify(params),
+        ...config,
+      },
+    );
   },
 
   put: <TResponse = unknown, RRequest = unknown>(
@@ -84,13 +83,13 @@ export const restClient = {
     params?: TQueryParams,
     config?: AxiosRequestConfig<TQueryParams>,
   ): Promise<AxiosResponse<TResponse, TQueryParams>> => {
-    return axiosClient.delete<TResponse, AxiosResponse<TResponse, TQueryParams>>(
-      url,
-      {
-        params,
-        ...config,
-      },
-    );
+    return axiosClient.delete<
+      TResponse,
+      AxiosResponse<TResponse, TQueryParams>
+    >(url, {
+      params,
+      ...config,
+    });
   },
 };
 

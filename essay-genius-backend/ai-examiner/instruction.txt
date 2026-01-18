@@ -1,6 +1,6 @@
 Step 1: Clone project 
 Step 2:  cd ai-examiner -> python -m venv venv
--> source venv/bin/activate.fish -> pip install -m toxicchecker/requirement.txt
+-> source venv/bin/activate.fish -> pip install -r requirements.txt
 Step 3: Label encoder : python -m toxicchecker.label_encoder
 Step 4: train model: python checker.py train (The training process quite long)
 Step 5: test: python checker.py infer “your sentence want to check”
