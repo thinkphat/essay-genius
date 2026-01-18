@@ -7,7 +7,7 @@ import { authContract } from "@/constracts/auth.contract";
 import { apiContracts } from "@/constracts";
 
 const apiConfig = {
-  baseUrl: "http://127.0.0.1:9050",
+  baseUrl: "http://localhost:9050",
   baseHeaders: {
     "Content-Type": "application/json",
   },

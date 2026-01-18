@@ -1,8 +1,11 @@
 server:
-  port: ${GATEWAY_PORT}
-  forward-headers-strategy: framework
+  port: 9050
 
 springdoc:
+  config:
+    import:
+      - "optional:file:env.properties"
+      - "optional:file:../env.properties"
   swagger-ui:
     path: /swagger-ui
 

@@ -23,7 +23,7 @@ class AIServiceServicer(ai_service_pb2_grpc.AIServiceServicer):
             api_key=os.environ.get("GEMINI_API_KEY"),
         )
 
-        model = "gemini-2.0-flash"
+        model = os.environ.get("GEMINI_MODEL")
         contents = [
             types.Content(
                 role="user",
