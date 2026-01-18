@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: eg-postgres
+  name: eg-postgres
+  namespace: essay-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-postgres
+  template:
+    metadata:
+      labels:
+        app: eg-postgres
+    spec:
+      containers:
+        - image: postgres:17
+          name: postgres
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eg-postgres-secrets
+                  key: POSTGRES_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eg-postgres-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: init-db
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: eg-postgres-pvc
+        - name: init-db
+          configMap:
+            name: eg-postgres-initdb
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eg-postgres
+  name: eg-postgres
+  namespace: essay-genius
+spec:
+  ports:
+    - name: 5432-5432
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app: eg-postgres
+  type: ClusterIP
+  #type: ClusterIP is default can be deleted
+
+---
+apiVersion: v1
+data:
+  POSTGRES_USER: ZXRlcm5pdHlfdXNlcg==
+  POSTGRES_PASSWORD: YV93aWxsX2V0ZXJuYWw=
+kind: Secret
+metadata:
+  name: eg-postgres-secrets
+  namespace: essay-genius
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: eg-postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/eg-identity-postgres
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eg-postgres-pvc
+  namespace: essay-genius
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-postgres-initdb
+  namespace: essay-genius
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS identity_service_db;

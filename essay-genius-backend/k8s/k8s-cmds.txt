@@ -1,0 +1,16 @@
+#Start minikube
+minikube start \
+--driver=docker \
+--container-runtime=docker
+
+eval $(minikube docker-env)
+
+# Create deployment template for copy
+kubectl create deployment eg-postgres --image=postgres:17 --port=5432 --replicas=1 --dry-run=client -o yaml
+
+# Create service template for copy
+kubectl create service clusterip eg-postgres --tcp=5432:5432 --dry-run=client -o yaml
+
+# Create secret template for popy( dry-run=client out put is yaml type)
+kubectl create secret eg-postgres-secrets --from-literal=postgres_password="a_will_eternal" --dry-run=client -o yaml
+echo -n codename | base64

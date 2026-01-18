@@ -1,58 +1,78 @@
 version: "3.7"
 services:
-#  eg-discovery:
-#    image: eg-discovery-server:${APPLICATION_TAG}
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.discoveryserver
-#    container_name: eg-discovery-server
-#    ports:
-#      - "8761:8761"
-#    env_file:
-#      - .env
-#    networks:
-#      - eg-network
-#
-#  eg-gateway:
-#    image: eg-gateway:${APPLICATION_TAG}
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.gateway
-#    container_name: eg-gateway
-#    ports:
-#      - "9050:9050"
-#    env_file:
-#      - .env
-#    networks:
-#      - eg-network
-#
-#  eg-essay:
-#    image: eg-essay-service:${APPLICATION_TAG}
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.essayservice
-#    container_name: eg-essay-service
-#    ports:
-#      - "10002:10002"
-#    env_file:
-#      - .env
-#      - env.properties
-#    networks:
-#      - eg-network
-#
-#  eg-interaction:
-#    image: eg-interaction-service:${APPLICATION_TAG}
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.interactionservice
-#    container_name: eg-interaction-service
-#    ports:
-#      - "10003:10003"
-#    env_file:
-#      - .env
-#      - env.properties
-#    networks:
-#      - eg-network
+  #  eg-discovery:
+  #    image: eg-discovery-server:${APPLICATION_TAG}
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile.discoveryserver
+  #    container_name: eg-discovery-server
+  #    ports:
+  #      - "8761:8761"
+  #    env_file:
+  #      - .env
+  #    networks:
+  #      - eg-network
+  #
+  #  eg-gateway:
+  #    image: eg-gateway:${APPLICATION_TAG}
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile.gateway
+  #    container_name: eg-gateway
+  #    ports:
+  #      - "9050:9050"
+  #    env_file:
+  #      - .env
+  #    networks:
+  #      - eg-network
+  #
+  #  eg-essay:
+  #    image: eg-essay-service:${APPLICATION_TAG}
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile.essayservice
+  #    container_name: eg-essay-service
+  #    ports:
+  #      - "10002:10002"
+  #    env_file:
+  #      - .env
+  #      - env.properties
+  #    networks:
+  #      - eg-network
+  #
+  #  eg-interaction:
+  #    image: eg-interaction-service:${APPLICATION_TAG}
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile.interactionservice
+  #    container_name: eg-interaction-service
+  #    ports:
+  #      - "10003:10003"
+  #    env_file:
+  #      - .env
+  #      - env.properties
+  #    networks:
+  #      - eg-network
+
+  #  eg-identity:
+  #    image: eg-identity-service:${APPLICATION_TAG}
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile.identityservice
+  #    container_name: eg-identity-service
+  #    environment:
+  #      POSTGRES_HOST: ${POSTGRES_HOST}
+  #      POSTGRES_PORT: ${POSTGRES_PORT}
+  #      POSTGRES_USER: ${POSTGRES_USER}
+  #      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #    depends_on: [ eg-identity-service-postgres ]
+  #    ports:
+  #      - "10000:10000"
+  #    env_file:
+  #      - .env
+  #      - env.properties
+  #    networks:
+  #      - eg-network
 
   # POSTGRES
   eg-identity-service-postgres:
@@ -68,31 +88,11 @@ services:
       - .env
     volumes:
       - eg-identity-service-postgres-data:/var/lib/postgresql/data
-      - ./postgres/identity-service-postgres-init-db:/docker-entrypoint-initdb.d
+      - ./postgres/identity-service-postgres-init-db/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
       - eg-network
-
-#  eg-identity:
-#    image: eg-identity-service:${APPLICATION_TAG}
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.identityservice
-#    container_name: eg-identity-service
-#    environment:
-#      POSTGRES_HOST: ${POSTGRES_HOST}
-#      POSTGRES_PORT: ${POSTGRES_PORT}
-#      POSTGRES_USER: ${POSTGRES_USER}
-#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-#    depends_on: [ eg-identity-service-postgres ]
-#    ports:
-#      - "10000:10000"
-#    env_file:
-#      - .env
-#      - env.properties
-#    networks:
-#      - eg-network
 
   # PGADMIN
   eg-identity-service-pgadmin:
@@ -287,11 +287,11 @@ networks:
     driver: bridge
 
 volumes:
-  eg-discovery:
-  eg-gateway:
-  eg-essay:
-  eg-identity:
-  eg-interaction:
+  # eg-discovery:
+  # eg-gateway:
+  # eg-essay:
+  # eg-identity:
+  # eg-interaction:
 
   eg-identity-service-postgres-data:
   eg-identity-service-pgadmin-data:
@@ -300,3 +300,4 @@ volumes:
   eg-essay-service-mongodb-data:
   eg-interaction-service-mongodb-data:
   eg-minio-data:
+

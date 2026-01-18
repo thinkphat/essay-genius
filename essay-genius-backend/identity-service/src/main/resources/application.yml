@@ -12,7 +12,7 @@ spring:
     name: identity-service
   #_______________________________________DATABASE_______________________________________
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/identity_service_db
+    url: jdbc:postgresql://eg-postgres:5432/identity_service_db
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
