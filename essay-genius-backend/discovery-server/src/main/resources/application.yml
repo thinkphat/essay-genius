@@ -9,7 +9,7 @@ spring:
     name: discovery-server
 eureka:
   instance:
-    hostname: ${DISCOVERY_SERVER_HOSTNAME}
+    hostname: ${DISCOVERY_SERVER_HOSTNAME:localhost}
     prefer-ip-address: false
   client:
     register-with-eureka: false

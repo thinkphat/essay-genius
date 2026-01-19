@@ -1,2 +1,2 @@
-CREATE DATABASE IF NOT EXISTS identity_service_db
+CREATE DATABASE identity_service_db
 

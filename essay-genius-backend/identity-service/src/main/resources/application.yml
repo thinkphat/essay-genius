@@ -12,7 +12,7 @@ spring:
     name: identity-service
   #_______________________________________DATABASE_______________________________________
   datasource:
-    url: jdbc:postgresql://eg-postgres:5432/identity_service_db
+    url: jdbc:postgresql://localhost:5432/identity_service_db
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -35,21 +35,24 @@ spring:
     default-locale: en
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_HOST}:${KAFKA_BOOTSTRAP_PORT}
-    identity-consumer:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_HOST:localhost}:${KAFKA_BOOTSTRAP_PORT:9094}
+
+    consumer:
       group-id: identity-service
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    identity-producer:
+
+    producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 
   mail:
     from: ${FROM_MAIL}
     host: smtp.gmail.com
     port: 587
-    verify-link: https://${API_DOMAIN}/identity/auth/verify-email-by-token
+    verify-link: https://localhost:9050/identity/auth/verify-email-by-token
     username: ${FROM_MAIL}
     password: ${SMTP_PASSWORD}
     default-encoding: UTF-8
@@ -60,12 +63,12 @@ spring:
           starttls:
             enable: true
 
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: ${DISCOVERY_SERVER_URL}
-#  instance:
-#    prefer-ip-address: false
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL}
+  instance:
+    prefer-ip-address: false
 
 grpc:
   server:
@@ -116,8 +119,11 @@ openapi:
     title: Identity Service REST API
     description: This is the API documentation for Identity Service.
     version: 1.0.0
-#    server-url: http://${IDENTITY_SERVICE_HOST:localhost}:${server.port}${server.servlet.context-path}
+    server-url: http://${IDENTITY_SERVICE_HOST:localhost}:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
+gateway:
+  domain: ${GATEWAY_HOST:localhost}
+  port: ${GATEWAY_PORT}
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

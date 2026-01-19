@@ -136,7 +136,7 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
-  @Transactional
+//  @Transactional
   protected void sendEmail(String email, VerificationType verificationType) {
     User user = userService.findByEmail(email);
 

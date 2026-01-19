@@ -29,18 +29,18 @@ spring:
             allowedHeaders: "Authorization,Content-Type,Accept-Language,No-Auth"
             allowCredentials: true
       routes:
-        - id: identity
-          uri: http://identity-service
+        - id: identity-service
+          uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=/identity/**
-#        - id: essay-service
-#          uri: lb://ESSAY-SERVICE
-#          predicates:
-#              - Path=/essay/**
-#        - id: interaction-service
-#          uri: lb://INTERACTION-SERVICE
-#          predicates:
-#            - Path=/interaction/**
+        - id: essay-service
+          uri: lb://ESSAY-SERVICE
+          predicates:
+              - Path=/essay/**
+        - id: interaction-service
+          uri: lb://INTERACTION-SERVICE
+          predicates:
+            - Path=/interaction/**
 
   main:
     web-application-type: reactive
@@ -57,12 +57,12 @@ logging:
     org.springframework.beans.factory: DEBUG
     org.springframework.cloud.gateway: DEBUG
 
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: ${DISCOVERY_SERVER_URL}
-#  instance:
-#    prefer-ip-address: false
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL}
+  instance:
+    prefer-ip-address: false
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

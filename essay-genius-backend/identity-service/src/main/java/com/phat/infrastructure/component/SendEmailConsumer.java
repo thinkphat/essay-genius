@@ -32,7 +32,7 @@ public class SendEmailConsumer {
 
     MailService mailService;
 
-    @KafkaListener(topics = KAFKA_TOPIC_SEND_MAIL, groupId = "${spring.kafka.identity-consumer.group-id}")
+    @KafkaListener(topics = KAFKA_TOPIC_SEND_MAIL, groupId = "${spring.kafka.consumer.group-id}")
     public void listenNotificationDelivery(String message) {
 
         log.info("[{}]: Message received: {}", MICROSERVICE_NAME, message);
