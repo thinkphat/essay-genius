@@ -30,7 +30,7 @@ spec:
       containers:
         - image: elestio/pgadmin:latest
           name: pgadmin
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           env:

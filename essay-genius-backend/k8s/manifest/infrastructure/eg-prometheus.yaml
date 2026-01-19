@@ -17,7 +17,7 @@ spec:
       containers:
         - name: prometheus
           image: prom/prometheus:main
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           args:
             - --enable-feature=exemplar-storage
             - --config.file=/etc/prometheus/prometheus.yml
