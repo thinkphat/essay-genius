@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eg-essay-mongodb
+  namespace: essay-genius
+spec:
+  serviceName: eg-essay-mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-essay-mongodb
+  template:
+    metadata:
+      labels:
+        app: eg-essay-mongodb
+    spec:
+      containers:
+        - name: essay-mongodb
+          image: mongo:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: eg-mongodb-admin-secrets
+                  key: MONGODB_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eg-mongodb-admin-secrets
+                  key: MONGODB_PASSWORD
+          volumeMounts:
+            - name: essay-data
+              mountPath: /data/db
+      volumes:
+        - name: essay-data
+          persistentVolumeClaim:
+            claimName: eg-essay-mongodb-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-essay-mongodb
+  namespace: essay-genius
+  labels: 
+    app: eg-essay-mongodb
+spec:
+  ports:
+    - name: 27017-27017
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+  selector:
+    app: eg-essay-mongodb
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eg-essay-mongodb-pvc
+  namespace: essay-genius
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+

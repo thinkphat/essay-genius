@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: eg-pgadmin
+  name: eg-pgadmin
+  namespace: essay-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-pgadmin
+  template:
+    metadata:
+      labels:
+        app: eg-pgadmin
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          - sh
+          - -c
+          - |
+            until nc -z eg-postgres 5432; do
+              echo "Waiting for postgres..."
+              sleep 2
+            done
+      containers:
+      - image: elestio/pgadmin:latest
+        name: pgadmin
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        env:
+          - name: PGADMIN_DEFAULT_EMAIL
+            valueFrom: 
+              secretKeyRef:
+                name: eg-pgadmin-secrets
+                key: PGADMIN_DEFAULT_EMAIL
+          - name: PGADMIN_DEFAULT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: eg-pgadmin-secrets
+                key: PGADMIN_DEFAULT_PASSWORD
+        volumeMounts:
+          - name: pgadmin-data
+            mountPath: /var/lib/pgadmin
+      volumes:
+        - name: pgadmin-data
+          persistentVolumeClaim:
+            claimName: eg-pgadmin-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eg-pgadmin
+  name: eg-pgadmin
+  namespace: essay-genius
+spec:
+  ports:
+  - name: 5050-80
+    port: 5050
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: eg-pgadmin
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eg-pgadmin-secrets
+  namespace: essay-genius
+data:
+  PGADMIN_DEFAULT_EMAIL: ZXRlcm5hbEBleGFtcGxlLmNvbQ==
+  PGADMIN_DEFAULT_PASSWORD: YV93aWxsX2V0ZXJuYWw=
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eg-pgadmin-pvc
+  namespace: essay-genius
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eg-redis
+  namespace: essay-genius
+spec:
+  serviceName: eg-redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-redis
+  template:
+    metadata:
+      labels:
+        app: eg-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: eg-redis-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eg-redis
+  name: eg-redis
+  namespace: essay-genius
+spec:
+  ports:
+    - name: 6379-6379
+      port: 6379
+      protocol: TCP
+      targetPort: 6379
+  selector:
+    app: eg-postgres
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eg-redis-pvc
+  namespace: essay-genius
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi

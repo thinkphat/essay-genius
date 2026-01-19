@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eg-loki
+  namespace: essay-genius
+spec:
+  serviceName: eg-loki
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-loki
+  template:
+    metadata:
+      labels:
+        app: eg-loki
+    spec:
+      containers:
+        - name: loki
+          image: grafana/loki:2.9.6
+          imagePullPolicy: IfNotPresent
+          args:
+            - -config.file=/etc/loki/loki.yaml
+          ports:
+            - containerPort: 3100
+          volumeMounts:
+            - name: loki-config
+              mountPath: /etc/loki
+            - name: loki-data
+              mountPath: /loki
+      volumes:
+        - name: loki-config
+          configMap:
+            name: eg-loki-config
+  volumeClaimTemplates:
+    - metadata:
+        name: loki-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 3Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-loki
+  namespace: essay-genius
+spec:
+  selector:
+    app: eg-loki
+  ports:
+    - port: 3100
+      targetPort: 3100
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-loki-config
+  namespace: essay-genius
+data:
+  loki.yaml: |
+    auth_enabled: false
+
+    server:
+      http_listen_port: 3100
+
+    common:
+      path_prefix: /loki
+      storage:
+        filesystem:
+          chunks_directory: /loki/chunks
+          rules_directory: /loki/rules
+      replication_factor: 1
+      ring:
+        kvstore:
+          store: inmemory
+
+    schema_config:
+      configs:
+        - from: 2024-01-01
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+    ruler:
+      alertmanager_url: http://eg-prometheus:9093

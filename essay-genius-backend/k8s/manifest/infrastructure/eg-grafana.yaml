@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eg-grafana
+  namespace: essay-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-grafana
+  template:
+    metadata:
+      labels:
+        app: eg-grafana
+    spec:
+      initContainers:
+        - name: wait-for-datasources
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z eg-prometheus 9090; do
+                echo "Waiting for Prometheus...";
+                sleep 2;
+              done
+              until nc -z eg-loki 3100; do
+                echo "Waiting for Loki...";
+                sleep 2;
+              done
+              until nc -z eg-tempo 3100; do
+                echo "Waiting for Tempo...";
+                sleep 2;
+              done
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eg-grafana-secrets
+                  key: GF_ADMIN_USER
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eg-grafana-secrets
+                  key: GF_ADMIN_PASSWORD
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+      volumes:
+        - name: grafana-datasources
+          configMap:
+            name: eg-grafana-datasources
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: eg-grafana-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-grafana
+  namespace: essay-genius
+spec:
+  selector:
+    app: eg-grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eg-grafana-secrets
+  namespace: essay-genius
+type: Opaque
+stringData:
+  GF_ADMIN_USER: admin
+  GF_ADMIN_PASSWORD: admin123
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eg-grafana-pvc
+  namespace: essay-genius
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard   
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-grafana-datasources
+  namespace: essay-genius
+  labels:
+    grafana_datasource: "1"
+data:
+  datasource.yml: |
+    apiVersion: 1
+
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://eg-prometheus:9090
+        isDefault: true
+
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://eg-loki:3100
+
+      - name: Tempo
+        type: tempo
+        access: proxy
+        url: http://eg-tempo:3100
+        jsonData:
+          tracesToLogs:
+            datasourceUid: 'Loki'
