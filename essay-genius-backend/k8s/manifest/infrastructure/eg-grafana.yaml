@@ -36,7 +36,7 @@ spec:
       containers:
         - name: grafana
           image: grafana/grafana:10.1.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           ports:
             - containerPort: 3000
           env:
@@ -101,7 +101,7 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: standard   
+  storageClassName: standard
 
 ---
 apiVersion: v1

@@ -17,7 +17,7 @@ spec:
       containers:
         - name: tempo
           image: grafana/tempo:main-bbe0435
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           args:
             - -config.file=/etc/tempo/tempo.yaml
           ports:
@@ -37,7 +37,7 @@ spec:
     - metadata:
         name: tempo-data
       spec:
-        accessModes: [ "ReadWriteOnce" ]
+        accessModes: ["ReadWriteOnce"]
         resources:
           requests:
             storage: 3Gi
@@ -93,4 +93,3 @@ data:
         backend: local
         local:
           path: /tmp/tempo/traces
-

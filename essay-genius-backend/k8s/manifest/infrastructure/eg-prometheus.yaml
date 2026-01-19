@@ -17,7 +17,7 @@ spec:
       containers:
         - name: prometheus
           image: prom/prometheus:main
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           args:
             - --enable-feature=exemplar-storage
             - --config.file=/etc/prometheus/prometheus.yml
@@ -37,7 +37,7 @@ spec:
     - metadata:
         name: prometheus-data
       spec:
-        accessModes: [ "ReadWriteOnce" ]
+        accessModes: ["ReadWriteOnce"]
         resources:
           requests:
             storage: 10Gi

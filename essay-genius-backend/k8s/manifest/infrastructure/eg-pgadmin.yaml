@@ -16,37 +16,37 @@ spec:
         app: eg-pgadmin
     spec:
       initContainers:
-      - name: wait-for-postgres
-        image: busybox:latest
-        imagePullPolicy: IfNotPresent
-        command:
-          - sh
-          - -c
-          - |
-            until nc -z eg-postgres 5432; do
-              echo "Waiting for postgres..."
-              sleep 2
-            done
+        - name: wait-for-postgres
+          image: busybox:latest
+          imagePullPolicy: Never
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z eg-postgres 5432; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
       containers:
-      - image: elestio/pgadmin:latest
-        name: pgadmin
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 80
-        env:
-          - name: PGADMIN_DEFAULT_EMAIL
-            valueFrom: 
-              secretKeyRef:
-                name: eg-pgadmin-secrets
-                key: PGADMIN_DEFAULT_EMAIL
-          - name: PGADMIN_DEFAULT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: eg-pgadmin-secrets
-                key: PGADMIN_DEFAULT_PASSWORD
-        volumeMounts:
-          - name: pgadmin-data
-            mountPath: /var/lib/pgadmin
+        - image: elestio/pgadmin:latest
+          name: pgadmin
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: eg-pgadmin-secrets
+                  key: PGADMIN_DEFAULT_EMAIL
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eg-pgadmin-secrets
+                  key: PGADMIN_DEFAULT_PASSWORD
+          volumeMounts:
+            - name: pgadmin-data
+              mountPath: /var/lib/pgadmin
       volumes:
         - name: pgadmin-data
           persistentVolumeClaim:
@@ -62,10 +62,10 @@ metadata:
   namespace: essay-genius
 spec:
   ports:
-  - name: 5050-80
-    port: 5050
-    protocol: TCP
-    targetPort: 80
+    - name: 5050-80
+      port: 5050
+      protocol: TCP
+      targetPort: 80
   selector:
     app: eg-pgadmin
   type: ClusterIP

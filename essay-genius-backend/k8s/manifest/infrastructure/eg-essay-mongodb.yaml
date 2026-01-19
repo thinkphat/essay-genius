@@ -17,7 +17,7 @@ spec:
       containers:
         - name: essay-mongodb
           image: mongo:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           ports:
             - containerPort: 27017
           env:
@@ -45,7 +45,7 @@ kind: Service
 metadata:
   name: eg-essay-mongodb
   namespace: essay-genius
-  labels: 
+  labels:
     app: eg-essay-mongodb
 spec:
   ports:
@@ -69,4 +69,3 @@ spec:
   resources:
     requests:
       storage: 1Gi
-

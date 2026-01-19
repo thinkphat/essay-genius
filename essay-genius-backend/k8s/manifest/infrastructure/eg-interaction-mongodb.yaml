@@ -17,7 +17,7 @@ spec:
       containers:
         - name: eg-interaction-mongodb
           image: mongo:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           ports:
             - containerPort: 27017
           env:
@@ -36,7 +36,7 @@ spec:
               mountPath: /data/db
       volumes:
         - name: interaction-data
-          persistentVolumeClaim: 
+          persistentVolumeClaim:
             claimName: eg-interaction-mongodb-pvc
 
 ---

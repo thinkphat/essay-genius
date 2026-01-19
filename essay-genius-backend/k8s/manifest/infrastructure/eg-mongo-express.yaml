@@ -16,7 +16,7 @@ spec:
       initContainers:
         - name: wait-for-mongodb
           image: mongo:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           command:
             - sh
             - -c
@@ -40,7 +40,7 @@ spec:
       containers:
         - name: mongo-express
           image: mongo-express:1.0.2-20-alpine3.19
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           ports:
             - containerPort: 8081
           env:
