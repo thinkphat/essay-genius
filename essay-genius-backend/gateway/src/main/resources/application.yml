@@ -1,13 +1,21 @@
 server:
   port: 9050
-
+  forward-headers-strategy: framework
 springdoc:
-  config:
-    import:
-      - "optional:file:env.properties"
-      - "optional:file:../env.properties"
   swagger-ui:
+    enabled: true
     path: /swagger-ui
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - name: Identity Service
+        url: /identity/v3/api-docs
+      - name: Essay Service
+        url: /essay/v3/api-docs
+      - name: Interaction Service
+        url: /interaction/v3/api-docs
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
 
 spring:
   config:
@@ -36,11 +44,11 @@ spring:
         - id: essay-service
           uri: lb://ESSAY-SERVICE
           predicates:
-              - Path=/essay/**
+            - Path=/essay,/essay/**
         - id: interaction-service
           uri: lb://INTERACTION-SERVICE
           predicates:
-            - Path=/interaction/**
+            - Path=/interaction,/interaction/**
 
   main:
     web-application-type: reactive

@@ -94,16 +94,6 @@ jwt:
   valid-duration: 1800 # in seconds
   refreshable-duration: 2592000 # in seconds
 
-#_______________________________________API DOCUMENT_______________________________________
-springdoc:
-  api-docs:
-    enabled: true
-    path: /api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui
-  show-actuator: true
-
 minio:
   endpoint: http://${MINIO_HOST}:${MINIO_PORT}
   access-key: ${MINIO_ACCESS_KEY}
@@ -111,17 +101,20 @@ minio:
   bucket-name: essay-genius-bucket
   temp-bucket-name: essay-genius-temp-bucket
 
+#_______________________________________API DOCUMENT_______________________________________
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: false
+  show-actuator: true
+
 openapi:
   service:
-    api-docs: identity-service-rest-api
     title: Identity Service REST API
     description: This is the API documentation for Identity Service.
     version: 1.0.0
-    server-url: http://${IDENTITY_SERVICE_HOST:localhost}:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
-gateway:
-  domain: ${GATEWAY_HOST:localhost}
-  port: ${GATEWAY_PORT}
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

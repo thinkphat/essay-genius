@@ -18,16 +18,12 @@ public class OpenApiConfig {
             String title,
             String description,
             String version,
-            String serverUrl,
             String serverDescription,
-            String gatewayDomain,
-            String gatewayPort,
             String contextPath
     ) {
         return new OpenAPI()
                 .servers(List.of(
-                        new Server().url(serverUrl).description(serverDescription),
-                        new Server().url(String.format("http://%s:%s%s", gatewayDomain, gatewayPort, contextPath))
+                        new Server().url(contextPath).description(serverDescription)
                 ))
                 .info(new Info()
                         .title(title)

@@ -15,32 +15,18 @@ import static com.phat.common.configs.OpenApiConfig.createOpenAPI;
 public class OpenApiConfig {
 
     @Bean
-    public GroupedOpenApi publicApi(@Value("${openapi.service.api-docs}") String apiDocs) {
-        return GroupedOpenApi.builder()
-                .group(apiDocs)
-                .packagesToScan("com.phat.api")
-                .build();
-    }
-
-    @Bean
     public OpenAPI openAPI(
             @Value("${openapi.service.title}") String title,
             @Value("${openapi.service.description}") String description,
             @Value("${openapi.service.version}") String version,
-            @Value("${openapi.service.server-url}") String serverUrl,
             @Value("${openapi.service.server-description}") String serverDescription,
-            @Value("${gateway.domain}") String gatewayDomain,
-            @Value("${gateway.port}") String gatewayPort,
             @Value("${server.servlet.context-path}") String contextPath
     ) {
         return createOpenAPI(
                 title,
                 description,
                 version,
-                serverUrl,
                 serverDescription,
-                gatewayDomain,
-                gatewayPort,
                 contextPath
         );
     }

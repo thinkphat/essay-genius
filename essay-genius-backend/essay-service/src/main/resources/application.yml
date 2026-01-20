@@ -63,19 +63,15 @@ eureka:
 springdoc:
   api-docs:
     enabled: true
-    path: /api-docs
   swagger-ui:
-    enabled: true
-    path: /swagger-ui
+    enabled: false
   show-actuator: true
 
 openapi:
   service:
-    api-docs: essay-service-rest-api
     title: Essay Service REST API
     description: This is the API documentation for Essay Service.
     version: 1.0.0
-    server-url: http://localhost:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
 
 #_______________________________________MANAGEMENT_______________________________________

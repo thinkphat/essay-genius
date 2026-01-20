@@ -63,24 +63,16 @@ eureka:
 springdoc:
   api-docs:
     enabled: true
-    path: /api-docs
   swagger-ui:
-    enabled: true
-    path: /swagger-ui
+    enabled: false
   show-actuator: true
 
 openapi:
   service:
-    api-docs: interaction-service-rest-api
     title: Interaction Service REST API
     description: This is the API documentation for Interaction Service.
     version: 1.0.0
-    server-url: http://${INTERACTION_SERVICE_HOST}:${server.port}${server.servlet.context-path}
     server-description: Essay Genius Backend API service For Development
-
-gateway:
-  domain: ${GATEWAY_HOST}
-  port: ${GATEWAY_PORT}
 
 #_______________________________________MANAGEMENT_______________________________________
 management:

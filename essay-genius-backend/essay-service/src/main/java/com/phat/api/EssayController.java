@@ -88,7 +88,7 @@ public class EssayController {
                         .build());
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Page<EssayScoredResponse>> getEssays(@ModelAttribute ListEssayRequest listEssayRequest)
             throws Exception {
