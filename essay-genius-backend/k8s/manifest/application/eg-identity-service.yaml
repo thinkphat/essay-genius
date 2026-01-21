@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eg-identity-service
+  namespace: essay-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-identity-service
+  template:
+    metadata:
+      labels:
+        app: eg-identity-service
+    spec:
+      containers:
+        - name: eg-identity
+          image: eg-identity-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 10000
+          envFrom:
+            - secretRef:
+                name: eg-identity-secrets
+            - configMapRef:
+                name: eg-grpc-config
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-identity-config
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-identity-config
+                  key: POSTGRES_PORT
+            - name: MINIO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-identity-config
+                  key: MINIO_HOST
+            - name: MINIO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-identity-config
+                  key: MINIO_PORT
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: LOKI_URL
+            - name: GATEWAY_PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: GATEWAY_PUBLIC_URL
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eg-postgres-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eg-postgres-secrets
+                  key: POSTGRES_PASSWORD
+            - name: SPRING_KAFKA_BOOTSTRAP-SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-identity-config
+                  key: SPRING_KAFKA_BOOTSTRAP-SERVERS
+            - name: FROM_MAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-identity-config
+                  key: FROM_MAIL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-identity-service
+  namespace: essay-genius
+spec:
+  type: ClusterIP
+  selector:
+    app: eg-identity-service
+  ports:
+    - protocol: TCP
+      port: 10000
+      targetPort: 10000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-identity-config
+  namespace: essay-genius
+data:
+  FROM_MAIL: nguyenthinhphat3009@gmail.com
+  POSTGRES_HOST: eg-postgres
+  POSTGRES_PORT: "5432"
+  MINIO_HOST: eg-minio
+  MINIO_PORT: "9000"
+  SPRING_KAFKA_BOOTSTRAP-SERVERS: "eg-kafka.essay-genius.svc.cluster.local:29092"

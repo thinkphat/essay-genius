@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-grpc-config
+  namespace: essay-genius
+data:
+  GRPC_IDENTITY_SERVICE_HOST: eg-identity-service
+  GRPC_IDENTITY_SERVICE_PORT: "9083"
+  GRPC_ESSAY_SERVICE_HOST: eg-essay-service
+  GRPC_ESSAY_SERVICE_PORT: "9082"
+  GRPC_INTERACTION_SERVICE_HOST: eg-interaction-service
+  GRPC_INTERACTION_SERVICE_PORT: "9084"
+  GRPC_AI_SERVICE_HOST: eg-ai-service
+  GRPC_AI_SERVICE_PORT: "9081"

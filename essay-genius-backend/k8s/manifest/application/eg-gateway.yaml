@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eg-gateway
+  namespace: essay-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-gateway
+  template:
+    metadata:
+      labels:
+        app: eg-gateway
+    spec:
+      containers:
+        - name: eg-gateway
+          image: eg-gateway:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9050
+          env:
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: LOKI_URL
+            - name: IDENTITY_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: IDENTITY_SERVICE_URL
+            - name: ESSAY_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: ESSAY_SERVICE_URL
+            - name: INTERACTION_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: INTERACTION_SERVICE_URL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-gateway
+  namespace: essay-genius
+spec:
+  type: ClusterIP
+  selector:
+    app: eg-gateway
+  ports:
+    - protocol: TCP
+      port: 9050
+      targetPort: 9050

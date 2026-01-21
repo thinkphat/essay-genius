@@ -14,6 +14,20 @@ spec:
       labels:
         app: eg-loki
     spec:
+      initContainers:
+        - name: grant-permission
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /loki/rules && \
+              chmod -R 750 /loki && \
+              chown -R 10001:10001 /loki
+          volumeMounts:
+            - name: loki-data
+              mountPath: /loki
       containers:
         - name: loki
           image: grafana/loki:2.9.6

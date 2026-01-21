@@ -1,6 +1,7 @@
 server:
   port: 9050
   forward-headers-strategy: framework
+
 springdoc:
   swagger-ui:
     enabled: true
@@ -26,30 +27,42 @@ spring:
     name: gateway
   cloud:
     gateway:
-#      discovery:
-#        locator:
-#          enabled: true
       globalcors:
         cors-configurations:
-          '[/**]':
+          "[/**]":
             allowedOrigins: ${ESSAY_GENIUS_URL}
             allowedMethods: "*"
             allowedHeaders: "Authorization,Content-Type,Accept-Language,No-Auth"
             allowCredentials: true
+      #      routes:
+      #        - id: identity-service
+      #          uri: lb://IDENTITY-SERVICE
+      #          predicates:
+      #            - Path=/identity/**
+      #        - id: essay-service
+      #          uri: lb://ESSAY-SERVICE
+      #          predicates:
+      #            - Path=/essay,/essay/**
+      #        - id: interaction-service
+      #          uri: lb://INTERACTION-SERVICE
+      #          predicates:
+      #            - Path=/interaction,/interaction/**
+
       routes:
         - id: identity-service
-          uri: lb://IDENTITY-SERVICE
+          uri: ${IDENTITY_SERVICE_URL}
           predicates:
             - Path=/identity/**
+
         - id: essay-service
-          uri: lb://ESSAY-SERVICE
+          uri: ${ESSAY_SERVICE_URL}
           predicates:
             - Path=/essay,/essay/**
+
         - id: interaction-service
-          uri: lb://INTERACTION-SERVICE
+          uri: ${INTERACTION_SERVICE_URL}
           predicates:
             - Path=/interaction,/interaction/**
-
   main:
     web-application-type: reactive
 
@@ -59,18 +72,17 @@ spring:
     default-locale: en
     cache-duration: 3600
 
+#logging:
+#  level:
+#    org.springframework.beans.factory: DEBUG
+#    org.springframework.cloud.gateway: DEBUG
 
-logging:
-  level:
-    org.springframework.beans.factory: DEBUG
-    org.springframework.cloud.gateway: DEBUG
-
-eureka:
-  client:
-    service-url:
-      defaultZone: ${DISCOVERY_SERVER_URL}
-  instance:
-    prefer-ip-address: false
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: ${DISCOVERY_SERVER_URL}
+#  instance:
+#    prefer-ip-address: false
 
 #_______________________________________MANAGEMENT_______________________________________
 management:
@@ -109,3 +121,6 @@ management:
     enabled: true
     sampling:
       probability: 1.0
+
+loki:
+  url: ${LOKI_URL}

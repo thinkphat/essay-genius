@@ -1,5 +1,5 @@
 server:
-  port: ${IDENTITY_SERVICE_PORT}
+  port: 10000
   servlet:
     context-path: /identity
 
@@ -12,7 +12,7 @@ spring:
     name: identity-service
   #_______________________________________DATABASE_______________________________________
   datasource:
-    url: jdbc:postgresql://localhost:5432/identity_service_db
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/identity_service_db
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -50,7 +50,7 @@ spring:
     from: ${FROM_MAIL}
     host: smtp.gmail.com
     port: 587
-    verify-link: http://localhost:9050/identity/auth/verify-email-by-token
+    verify-link: ${GATEWAY_PUBLIC_URL}/identity/auth/verify-email-by-token
     username: ${FROM_MAIL}
     password: ${SMTP_PASSWORD}
     default-encoding: UTF-8
@@ -61,12 +61,12 @@ spring:
           starttls:
             enable: true
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${DISCOVERY_SERVER_URL}
-  instance:
-    prefer-ip-address: false
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: ${DISCOVERY_SERVER_URL}
+#  instance:
+#    prefer-ip-address: false
 
 grpc:
   server:
@@ -89,8 +89,8 @@ grpc:
 #    org.springframework: DEBUG
 
 jwt:
-  accessSignerKey: ${accessSignerKey}
-  refreshSignerKey: ${refreshSignerKey}
+  accessSignerKey: ${JWT_ACCESS_SIGNER_KEY}
+  refreshSignerKey: ${JWT_REFRESH_SIGNER_KEY}
   valid-duration: 1800 # in seconds
   refreshable-duration: 2592000 # in seconds
 
@@ -153,3 +153,6 @@ management:
     enabled: true
     sampling:
       probability: 1.0
+
+loki:
+  url: http://localhost:3100/loki/api/v1/push
