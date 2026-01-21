@@ -69,3 +69,12 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-interaction-mongodb-config
+  namespace: essay-genius
+data:
+  INTERACTION_MONGODB_HOST: eg-interaction-mongodb

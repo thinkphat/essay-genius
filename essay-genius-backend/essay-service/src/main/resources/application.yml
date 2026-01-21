@@ -24,8 +24,8 @@ grpc:
       negotiationType: plaintext
 
 jwt:
-  accessSignerKey: ${accessSignerKey}
-  refreshSignerKey: ${refreshSignerKey}
+  accessSignerKey: ${JWT_ACCESS_SIGNER_KEY}
+  refreshSignerKey: ${JWT_REFRESH_SIGNER_KEY}
   valid-duration: 1800 # in seconds
   refreshable-duration: 2592000 # in seconds
 
@@ -52,7 +52,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${DISCOVERY_SERVER_URL}
+      defaultZone: ${DISCOVERY_SERVER_URL:http://localhost:8761/eureka}
   instance:
     prefer-ip-address: false
 
@@ -63,6 +63,7 @@ eureka:
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs
   swagger-ui:
     enabled: false
   show-actuator: true

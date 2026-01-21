@@ -11,7 +11,7 @@ datasources:
     uid: prometheus
     access: proxy
     orgId: 1
-    url: http://essay-genius-prometheus:9090
+    url: http://eg-prometheus:9090
     basicAuth: false
     isDefault: false
     version: 1
@@ -28,7 +28,7 @@ datasources:
     uid: tempo
     access: proxy
     orgId: 1
-    url: http://essay-genius-tempo:3100
+    url: http://eg-tempo:3100
     basicAuth: false
     isDefault: false
     version: 1
@@ -58,7 +58,7 @@ datasources:
     uid: loki
     access: proxy
     orgId: 1
-    url: http://essay-genius-loki:3100
+    url: http://eg-loki:3100
     basicAuth: false
     isDefault: true
     version: 1

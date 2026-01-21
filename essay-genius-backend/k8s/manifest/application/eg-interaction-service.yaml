@@ -1,0 +1,62 @@
+apiVersion: apps/1
+kind: Deployment
+metadata:
+  name: eg-interaction-service
+  namespace: interaction-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-interaction-service
+  template:
+    metadata:
+      labels:
+        app: eg-interaction-service
+    spec:
+      containers:
+        - name: eg-interaction
+          image: eg-interaction-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 10003
+          envFrom:
+            configMapRef:
+              name: eg-grpc-config
+            secretRef:
+              name: eg-mongodb-admin-secrets
+          env:
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: LOKI_URL
+            - name: JWT_ACCESS_SIGNER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eg-identity-secrets
+                  key: JWT_ACCESS_SIGNER_KEY
+            - name: JWT_REFRESH_SIGNER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eg-identity-secrets
+                  key: JWT_REFRESH_SIGNER_KEY
+            - name: MONGODB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-interaction-mongodb-config
+                  key: INTERACTION_MONGODB_HOST
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-interaction-service
+  namespace: interaction-genius
+spec:
+  type: ClusterIP
+  selector:
+    app: eg-interaction-genius
+  ports:
+    - protocol: TCP
+      port: 10003
+      targetPort: 10003

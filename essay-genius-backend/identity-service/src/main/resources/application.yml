@@ -50,7 +50,7 @@ spring:
     from: ${FROM_MAIL}
     host: smtp.gmail.com
     port: 587
-    verify-link: ${GATEWAY_PUBLIC_URL}/identity/auth/verify-email-by-token
+    verify-link: ${GATEWAY_PUBLIC_URL:http://localhost:9050}/identity/auth/verify-email-by-token
     username: ${FROM_MAIL}
     password: ${SMTP_PASSWORD}
     default-encoding: UTF-8
@@ -61,12 +61,12 @@ spring:
           starttls:
             enable: true
 
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: ${DISCOVERY_SERVER_URL}
-#  instance:
-#    prefer-ip-address: false
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: false
 
 grpc:
   server:
@@ -105,6 +105,7 @@ minio:
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs
   swagger-ui:
     enabled: false
   show-actuator: true

@@ -1,0 +1,63 @@
+apiVersion: apps/1
+kind: Deployment
+metadata:
+  name: eg-essay-service
+  namespace: essay-genius
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eg-essay-service
+  template:
+    metadata:
+      labels:
+        app: eg-essay-service
+    spec:
+      containers:
+        - name: eg-essay
+          image: eg-essay-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 10002
+          envFrom:
+            configMapRef:
+              name: eg-grpc-config
+            secretRef:
+              name: eg-mongodb-admin-secrets
+          env:
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: LOKI_URL
+            - name: JWT_ACCESS_SIGNER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eg-identity-secrets
+                  key: JWT_ACCESS_SIGNER_KEY
+            - name: JWT_REFRESH_SIGNER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eg-identity-secrets
+                  key: JWT_REFRESH_SIGNER_KEY
+            - name: MONGODB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: eg-essay-mongodb-config
+                  key: ESSAY_MONGODB_HOST
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eg-essay-service
+  namespace: essay-genius
+spec:
+  type: ClusterIP
+  selector:
+    app: eg-essay-genius
+  ports:
+    - protocol: TCP
+      port: 10002
+      targetPort: 10002
+

@@ -27,7 +27,7 @@
         <java.version>21</java.version>
 
         <spring-grpc.version>3.1.0.RELEASE</spring-grpc.version>
-        <loki.version>1.5.1</loki.version>
+        <loki.version>1.5.2</loki.version>
         <datasource-micrometer.version>1.0.4</datasource-micrometer.version>
         <protobuf-plugin.version>0.6.1</protobuf-plugin.version>
 
@@ -46,6 +46,11 @@
         </repository>
     </repositories>
     <dependencies>
+        <!--        SPRING ACTUATOR FOR METRICS-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -131,6 +136,10 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
         </dependency>
 
     </dependencies>
