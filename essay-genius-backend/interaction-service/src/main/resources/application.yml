@@ -111,3 +111,6 @@ management:
     enabled: true
     sampling:
       probability: 1.0
+
+loki:
+  url: ${LOKI_URL:http://localhost:3100/loki/api/v1/push}
