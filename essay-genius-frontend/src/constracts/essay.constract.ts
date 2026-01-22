@@ -1,14 +1,19 @@
-import { pageableRequestSchema, pageableResponseSchema } from '@/lib/schemas/page.schema';
-import { initContract } from '@ts-rest/core';
-import { z } from 'zod';
+import {
+  pageableRequestSchema,
+  pageableResponseSchema,
+} from "@/lib/schemas/page.schema";
+import { initContract } from "@ts-rest/core";
+import { z } from "zod";
 
 const c = initContract();
+const isBrowser = typeof window !== "undefined";
+
 export const uploadFileBodySchema = z.object({
-  file: z
-    .instanceof(File)
-    .refine((mFile) => mFile.size < 20 * 2 * 1024 * 1024, {
-      message: "File size should be less than 20 MB",
-    }),
+  file: isBrowser
+    ? z.instanceof(File).refine((mFile) => mFile.size < 20 * 1024 * 1024, {
+        message: "File size should be less than 20 MB",
+      })
+    : z.any(),
 });
 export type UploadFileBodySchema = z.infer<typeof uploadFileBodySchema>;
 
@@ -43,24 +48,33 @@ export const essayTaskTwoScoreResponseSchema = z.object({
   improvementTips: z.array(z.string()),
   rewrittenParagraph: z.string(),
 });
-export type EssayTaskTwoScoreResponse = z.infer<typeof essayTaskTwoScoreResponseSchema>;
+export type EssayTaskTwoScoreResponse = z.infer<
+  typeof essayTaskTwoScoreResponseSchema
+>;
 
 export const essayTaskTwoScoringRequestSchema = z.object({
   essayPrompt: z.string(),
   essayText: z.string(),
 });
-export type EssayTaskTwoScoringRequest = z.infer<typeof essayTaskTwoScoringRequestSchema>;
+export type EssayTaskTwoScoringRequest = z.infer<
+  typeof essayTaskTwoScoringRequestSchema
+>;
 
 export const essayResponseWrapperObjectSchema = z.object({
   valid: z.boolean(),
   result: z.union([essayTaskTwoScoreResponseSchema, z.string()]), // if invalid result is just a string
-}); export type EssayResponseWrapperObject = z.infer<typeof essayResponseWrapperObjectSchema>;
+});
+export type EssayResponseWrapperObject = z.infer<
+  typeof essayResponseWrapperObjectSchema
+>;
 
 export const essayResponseWrapperScoreSchema = z.object({
   valid: z.boolean(),
   result: essayTaskTwoScoreResponseSchema,
 });
-export type EssayResponseWrapperScore = z.infer<typeof essayResponseWrapperScoreSchema>;
+export type EssayResponseWrapperScore = z.infer<
+  typeof essayResponseWrapperScoreSchema
+>;
 
 export const essaySaveRequestSchema = z.object({
   essayText: z.string(),
@@ -79,7 +93,9 @@ export const essayResponseWrapperStringSchema = z.object({
   valid: z.boolean(),
   result: z.string(),
 });
-export type EssayResponseWrapperString = z.infer<typeof essayResponseWrapperStringSchema>;
+export type EssayResponseWrapperString = z.infer<
+  typeof essayResponseWrapperStringSchema
+>;
 
 export const commonResponseSchema = z.object({
   errorCode: z.string(),
@@ -119,7 +135,10 @@ export type UserInfo = z.infer<typeof userInfoSchema>;
 export const reactedInfoSchema = z.object({
   isReacted: z.boolean(),
   reactionId: z.string().nullable().optional(),
-  reactionType: z.enum(['STAR', 'LOVE', 'HAHA', 'WOW', 'FIRE', 'SAD']).nullable().optional(),
+  reactionType: z
+    .enum(["STAR", "LOVE", "HAHA", "WOW", "FIRE", "SAD"])
+    .nullable()
+    .optional(),
 });
 export const essayScoredResponseSchema = z.object({
   id: z.string(),
@@ -135,70 +154,73 @@ export const essayScoredResponseSchema = z.object({
 });
 export type EssayScoredResponse = z.infer<typeof essayScoredResponseSchema>;
 
-export const listEssayResponseSchema = pageableResponseSchema(essayScoredResponseSchema);
+export const listEssayResponseSchema = pageableResponseSchema(
+  essayScoredResponseSchema,
+);
 export type ListEssayResponse = z.infer<typeof listEssayResponseSchema>;
 
 export const generateEssayPromptRequestSchema = z.object({
   topics: z.array(z.string()),
 });
-export type GenerateEssayPromptRequest = z.infer<typeof generateEssayPromptRequestSchema>;
+export type GenerateEssayPromptRequest = z.infer<
+  typeof generateEssayPromptRequestSchema
+>;
 // =================== ROUTER CONTRACT ===================
 
 export const essayContract = c.router({
   scoring: {
-    method: 'POST',
-    path: '/essay/scoring-essay',
+    method: "POST",
+    path: "/essay/scoring-essay",
     body: essayTaskTwoScoringRequestSchema,
     responses: {
       200: essayResponseWrapperObjectSchema,
     },
   },
   saveEssay: {
-    method: 'POST',
-    path: '/essay/save-essay',
+    method: "POST",
+    path: "/essay/save-essay",
     body: essaySaveRequestSchema,
     responses: {
       201: commonResponseSchema,
     },
   },
   generateEssayPrompt: {
-    method: 'POST',
-    path: '/essay/generate-essay-prompt',
+    method: "POST",
+    path: "/essay/generate-essay-prompt",
     body: generateEssayPromptRequestSchema,
     responses: {
       200: essayResponseWrapperStringSchema,
     },
   },
   getEssays: {
-    method: 'GET',
-    path: '/essay/',
+    method: "GET",
+    path: "/essay/",
     query: listEssayRequestSchema,
     responses: {
       200: listEssayResponseSchema,
     },
   },
   hello: {
-    method: 'GET',
-    path: '/essay/hello',
+    method: "GET",
+    path: "/essay/hello",
     responses: {
       200: z.string(),
     },
   },
   getEssay: {
-    method: 'GET',
-    path: '/essay/get-essay/:id',
+    method: "GET",
+    path: "/essay/get-essay/:id",
     pathParams: z.object({ id: z.string() }),
     responses: {
       200: essayDetailSchema,
     },
   },
   deleteEssay: {
-    method: 'DELETE',
-    path: '/essay/delete-essay/:id',
+    method: "DELETE",
+    path: "/essay/delete-essay/:id",
     pathParams: z.object({ id: z.string() }),
     responses: {
       200: commonResponseSchema,
     },
   },
 });
-

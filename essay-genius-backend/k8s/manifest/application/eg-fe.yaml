@@ -1,36 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fe-essay
+  name: eg-frontend
   namespace: essay-genius
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: fe-essay
+      app: eg-frontend
   template:
     metadata:
       labels:
-        app: fe-essay
+        app: eg-frontend
     spec:
       containers:
-        - name: fe-essay
-          image: your-dockerhub-user/essay-frontend:v1
+        - name: eg-frontend
+          image: eg-frontend:v1
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4000
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://eg-gateway.essay-genius.local"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: fe-essay
+  name: eg-frontend
   namespace: essay-genius
 spec:
   type: ClusterIP
   selector:
-    app: fe-essay
+    app: eg-frontend
   ports:
     - name: http
       protocol: TCP
-      port: 4000
+      port: 3000
       targetPort: 80

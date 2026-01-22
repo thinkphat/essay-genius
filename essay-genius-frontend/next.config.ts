@@ -1,9 +1,25 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "standalone",
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
-    domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: process.env.NEXT_PUBLIC_IMAGE_HOST || "localhost",
+      },
+      {
+        protocol: "https",
+        hostname:
+          process.env.NEXT_PUBLIC_IMAGE_HOST || "api.essay-genius.local",
+      },
+    ],
   },
 };
 

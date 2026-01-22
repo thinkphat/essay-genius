@@ -6,8 +6,9 @@ import { COOKIE_KEY_ACCESS_TOKEN, COOKIE_KEY_REFRESH_TOKEN } from "@/constants";
 import { authContract } from "@/constracts/auth.contract";
 import { apiContracts } from "@/constracts";
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9050";
 const apiConfig = {
-  baseUrl: "http://localhost:9050",
+  baseUrl,
   baseHeaders: {
     "Content-Type": "application/json",
   },
