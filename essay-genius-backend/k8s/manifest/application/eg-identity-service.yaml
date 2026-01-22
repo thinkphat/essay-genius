@@ -24,27 +24,9 @@ spec:
                 name: eg-identity-secrets
             - configMapRef:
                 name: eg-grpc-config
+            - configMapRef:
+                name: eg-identity-config
           env:
-            - name: POSTGRES_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: eg-identity-config
-                  key: POSTGRES_HOST
-            - name: POSTGRES_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: eg-identity-config
-                  key: POSTGRES_PORT
-            - name: MINIO_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: eg-identity-config
-                  key: MINIO_HOST
-            - name: MINIO_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: eg-identity-config
-                  key: MINIO_PORT
             - name: LOKI_URL
               valueFrom:
                 configMapKeyRef:
@@ -65,16 +47,6 @@ spec:
                 secretKeyRef:
                   name: eg-postgres-secrets
                   key: POSTGRES_PASSWORD
-            - name: SPRING_KAFKA_BOOTSTRAP-SERVERS
-              valueFrom:
-                configMapKeyRef:
-                  name: eg-identity-config
-                  key: SPRING_KAFKA_BOOTSTRAP-SERVERS
-            - name: FROM_MAIL
-              valueFrom:
-                configMapKeyRef:
-                  name: eg-identity-config
-                  key: FROM_MAIL
 
 ---
 apiVersion: v1
@@ -87,9 +59,14 @@ spec:
   selector:
     app: eg-identity-service
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 10000
       targetPort: 10000
+    - name: grpc
+      protocol: TCP
+      port: 9083
+      targetPort: 9083
 
 ---
 apiVersion: v1
@@ -104,3 +81,5 @@ data:
   MINIO_HOST: eg-minio
   MINIO_PORT: "9000"
   SPRING_KAFKA_BOOTSTRAP-SERVERS: "eg-kafka.essay-genius.svc.cluster.local:29092"
+  REDIS_HOST: eg-redis
+  REDIS_PORT: "6379"

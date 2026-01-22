@@ -13,6 +13,23 @@ spec:
       labels:
         app: eg-minio
     spec:
+      initContainers:
+        - name: init-buckets
+          image: minio/mc:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Waiting for MinIO..."
+              until nc -z localhost 9000; do sleep 2; done
+              echo "Setting alias..."
+              mc alias set myminio http://localhost:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+              echo "Creating buckets..."
+              mc mb --ignore-existing myminio/user-avatars
+              echo "Buckets ready!"
+          envFrom:
+            - secretRef:
+                name: eg-minio-secrets
       containers:
         - name: minio
           image: minio/minio:RELEASE.2024-08-17T01-24-54Z.fips

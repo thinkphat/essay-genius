@@ -1,4 +1,4 @@
-apiVersion: apps/1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: eg-essay-service
@@ -20,10 +20,10 @@ spec:
           ports:
             - containerPort: 10002
           envFrom:
-            configMapRef:
-              name: eg-grpc-config
-            secretRef:
-              name: eg-mongodb-admin-secrets
+            - configMapRef:
+                name: eg-grpc-config
+            - secretRef:
+                name: eg-mongodb-admin-secrets
           env:
             - name: LOKI_URL
               valueFrom:
@@ -55,9 +55,14 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: eg-essay-genius
+    app: eg-essay-service
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 10002
       targetPort: 10002
 
+    - name: grpc
+      protocol: TCP
+      port: 9082
+      targetPort: 9082

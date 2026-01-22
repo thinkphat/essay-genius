@@ -5,28 +5,36 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['eg-prometheus:9090']
+      - targets: ['localhost:9090']
 
-  - job_name: 'Gateway'
+  - job_name: 'gateway'
     scrape_interval: 2s
-    metrics_path: '/metrics'
+    metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['localhost:9050']
+        labels:
+          application: "gateway"
 
-  - job_name: 'IdentityService'
+  - job_name: 'identityservice'
     scrape_interval: 2s
-    metrics_path: '/metrics'
+    metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['localhost:10000']
+        labels:
+          application: "identity service"
 
-  - job_name: 'EssayService'
+  - job_name: 'essayservice'
     scrape_interval: 2s
-    metrics_path: '/metrics'
+    metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:10002' ]
+      - targets: ['localhost:10002']
+        labels:
+          application: "essay service"
 
-  - job_name: 'InteractionService'
+  - job_name: 'interactionservice'
     scrape_interval: 2s
-    metrics_path: '/metrics'
+    metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:10003' ]
+      - targets: ['lcalhost:10003']
+        labels:
+          application: "interaction service"

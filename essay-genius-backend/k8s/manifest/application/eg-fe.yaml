@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fe-essay
+  namespace: essay-genius
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fe-essay
+  template:
+    metadata:
+      labels:
+        app: fe-essay
+    spec:
+      containers:
+        - name: fe-essay
+          image: your-dockerhub-user/essay-frontend:v1
+          ports:
+            - containerPort: 4000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe-essay
+  namespace: essay-genius
+spec:
+  type: ClusterIP
+  selector:
+    app: fe-essay
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4000
+      targetPort: 80

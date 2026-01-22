@@ -14,6 +14,19 @@ spec:
       labels:
         app: eg-tempo
     spec:
+      initContainers:
+        - name: grant-permission
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /tmp/tempo/traces && \
+              chown -R 10001:10001 /tmp/tempo
+          volumeMounts:
+            - name: tempo-data
+              mountPath: /tmp/tempo
       containers:
         - name: tempo
           image: grafana/tempo:main-bbe0435

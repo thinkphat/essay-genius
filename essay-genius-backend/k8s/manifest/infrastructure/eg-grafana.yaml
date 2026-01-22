@@ -13,26 +13,6 @@ spec:
       labels:
         app: eg-grafana
     spec:
-      initContainers:
-        - name: wait-for-datasources
-          image: busybox:latest
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-            - -c
-            - |
-              until nc -z eg-prometheus 9090; do
-                echo "Waiting for Prometheus...";
-                sleep 2;
-              done
-              until nc -z eg-loki 3100; do
-                echo "Waiting for Loki...";
-                sleep 2;
-              done
-              until nc -z eg-tempo 3100; do
-                echo "Waiting for Tempo...";
-                sleep 2;
-              done
       containers:
         - name: grafana
           image: grafana/grafana:10.1.0
@@ -50,11 +30,16 @@ spec:
                 secretKeyRef:
                   name: eg-grafana-secrets
                   key: GF_ADMIN_PASSWORD
+
+            - name: GF_DATAPROXY_TIMEOUT
+              value: "120"
+
           volumeMounts:
             - name: grafana-storage
               mountPath: /var/lib/grafana
             - name: grafana-datasources
               mountPath: /etc/grafana/provisioning/datasources
+
       volumes:
         - name: grafana-datasources
           configMap:
@@ -62,7 +47,6 @@ spec:
         - name: grafana-storage
           persistentVolumeClaim:
             claimName: eg-grafana-pvc
-
 ---
 apiVersion: v1
 kind: Service
@@ -109,28 +93,42 @@ kind: ConfigMap
 metadata:
   name: eg-grafana-datasources
   namespace: essay-genius
-  labels:
-    grafana_datasource: "1"
 data:
   datasource.yml: |
     apiVersion: 1
 
+    deleteDatasources:
+      - name: Prometheus
+      - name: Loki
+      - name: Tempo
+
     datasources:
       - name: Prometheus
+        uid: prometheus
         type: prometheus
         access: proxy
         url: http://eg-prometheus:9090
         isDefault: true
+        editable: false
 
       - name: Loki
+        uid: loki
         type: loki
         access: proxy
         url: http://eg-loki:3100
+        editable: false
 
       - name: Tempo
+        uid: tempo
         type: tempo
         access: proxy
         url: http://eg-tempo:3100
+        editable: false
         jsonData:
           tracesToLogs:
-            datasourceUid: 'Loki'
+            datasourceUid: loki
+            tags: ["service.name", "pod", "namespace"]
+            spanStartTimeShift: "1h"
+            spanEndTimeShift: "1h"
+            filterByTraceID: true
+            filterBySpanID: false

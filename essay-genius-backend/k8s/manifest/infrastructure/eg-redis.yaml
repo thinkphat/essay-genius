@@ -43,7 +43,7 @@ spec:
       protocol: TCP
       targetPort: 6379
   selector:
-    app: eg-postgres
+    app: eg-redis
   type: ClusterIP
 
 ---

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: essay-ingress
+  namespace: essay-genius
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: essay.genius.me.vn
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe-essay
+                port:
+                  number: 80
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: eg-gateway
+                port:
+                  number: 9050

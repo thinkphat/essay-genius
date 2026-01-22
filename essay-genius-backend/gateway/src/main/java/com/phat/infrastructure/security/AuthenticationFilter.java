@@ -68,6 +68,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/interaction/v3/api-docs/**",
             "/swagger-ui/**",
             "/api-docs/**",
+            "/actuator/prometheus"
     };
 
     List<Locale> LOCALES = List.of(

@@ -14,6 +14,19 @@ spec:
       labels:
         app: eg-prometheus
     spec:
+      initContainers:
+        - name: grant-permission
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /prometheus &&\
+              chown -R 65534:65534 /prometheus
+          volumeMounts:
+            - name: prometheus-data
+              mountPath: /prometheus
       containers:
         - name: prometheus
           image: prom/prometheus:main
@@ -65,9 +78,42 @@ metadata:
 data:
   prometheus.yml: |
     global:
-      scrape_interval: 15s
-
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    
     scrape_configs:
-      - job_name: "prometheus"
+      - job_name: 'prometheus'
         static_configs:
-          - targets: ["localhost:9090"]
+          - targets: ['eg-prometheus:9090']
+    
+      - job_name: 'gateway'
+        scrape_interval: 2s
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['eg-gateway.essay-genius.svc.cluster.local:9050']
+            labels:
+              application: "gateway"
+    
+      - job_name: 'identityservice'
+        scrape_interval: 2s
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['eg-identity-service.essay-genius.svc.cluster.local:10000']
+            labels:
+              application: "identity service"
+    
+      - job_name: 'essayservice'
+        scrape_interval: 2s
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['eg-essay-service.essay-genius.svc.cluster.local:10002']
+            labels:
+              application: "essay service"
+    
+      - job_name: 'interactionservice'
+        scrape_interval: 2s
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['eg-interaction-service.essay-genius.svc.cluster.local:10003']
+            labels:
+              application: "interaction service"
