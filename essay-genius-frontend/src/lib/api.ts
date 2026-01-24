@@ -6,9 +6,14 @@ import { COOKIE_KEY_ACCESS_TOKEN, COOKIE_KEY_REFRESH_TOKEN } from "@/constants";
 import { authContract } from "@/constracts/auth.contract";
 import { apiContracts } from "@/constracts";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9050";
+// const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+//
+// if (!baseUrl) {
+//   throw new Error("NEXT_PUBLIC_API_URL is not defined");
+// }
+
 const apiConfig = {
-  baseUrl,
+  baseUrl: "",
   baseHeaders: {
     "Content-Type": "application/json",
   },

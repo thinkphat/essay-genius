@@ -20,6 +20,11 @@ spec:
           ports:
             - containerPort: 9050
           env:
+            - name: ESSAY_GENIUS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: ESSAY_GENIUS_URL
             - name: LOKI_URL
               valueFrom:
                 configMapKeyRef:

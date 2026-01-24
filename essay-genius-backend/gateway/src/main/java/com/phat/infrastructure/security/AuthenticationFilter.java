@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phat.api.model.response.CommonResponse;
 import com.phat.app.exception.AppErrorCode;
+import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -111,13 +112,12 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         long startTime = System.currentTimeMillis();
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod().name())) { return chain.filter(exchange); }
+        exchange.getRequest().getMethod();
         if (isPublicEndpoint(exchange.getRequest()))
             return chain.filter(exchange).then(Mono.fromRunnable(() -> {
             ServerHttpResponse response = exchange.getResponse();
             long duration = System.currentTimeMillis() - startTime;
-
-            log.info("Outgoing Response -> Status: {}, Duration: {}ms, Headers: {}",
-                    response.getStatusCode(), duration, response.getHeaders());
         }));
 
         // Get token from authorization header
