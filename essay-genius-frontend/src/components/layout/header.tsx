@@ -17,11 +17,13 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useSignOutMutation } from "@/hooks/mutations/auth.mutation";
 import { getCookie } from "cookies-next";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { useTokenStore } from "@/hooks/token-store";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { setTheme, theme } = useTheme();
-  const { data: user, isLoading } = useCurrentUser();
+  const accessToken = useTokenStore((s) => s.accessToken);
+  const { data: user, isLoading } = useCurrentUser(!!accessToken);
   const signOut = useSignOutMutation();
   const [mounted, setMounted] = useState(false);
 
