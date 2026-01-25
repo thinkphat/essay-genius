@@ -4,7 +4,7 @@ metadata:
   name: eg-frontend
   namespace: essay-genius
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: eg-frontend
