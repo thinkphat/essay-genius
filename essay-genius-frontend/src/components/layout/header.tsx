@@ -93,24 +93,24 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <div className="cursor-pointer">
                     {user ? (
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-10 w-10 rounded-full">
                         {user.avatar ? (
                           <AvatarImage
                             src={user.avatar}
                             alt={`${user.firstName} ${user.lastName}`}
-                            className="object-cover"
+                            className="h-10 w-10 rounded-full object-cover"
                           />
                         ) : null}
 
                         <AvatarFallback
                           className="
-        w-10 h-10
-        rounded-full
-        flex items-center justify-center
-        text-lg
-        bg-orange-300
-        text-white
-      "
+                            w-10 h-10
+                            rounded-full
+                            flex items-center justify-center
+                            text-lg
+                            bg-orange-300
+                            text-white
+                          "
                         >
                           {user.firstName.charAt(0)}
                         </AvatarFallback>
