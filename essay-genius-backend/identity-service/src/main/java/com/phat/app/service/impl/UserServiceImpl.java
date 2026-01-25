@@ -65,14 +65,13 @@ public class UserServiceImpl implements UserService {
     public User getCurrentUserInfo() {
         String id = getCurrentUser();
         User user = findById(id);
-        String url = minioClientService.getObjectUrl("default-avatar-url.png", "user-avatars");
         try {
-            url = minioClientService.getObjectUrl(user.getAvatar(), "user-avatars");
+            String url = minioClientService.getObjectUrl(user.getAvatar(), "user-avatars");
+            user.setAvatar(url);
             log.debug("Avatar URL retrieved: {}", url);
         } catch (Exception e) {
             log.error("Error when retrieving avatar URL for user: {}", user.getEmail(), e);
         }
-        user.setAvatar(url);
         return user;
     }
     @Override

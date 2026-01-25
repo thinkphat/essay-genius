@@ -34,12 +34,13 @@ export const useTokenStore = create<TokenStore>(
       clearTokens: () => {
         Cookies.remove(COOKIE_KEY_ACCESS_TOKEN, { path: "/" });
         Cookies.remove(COOKIE_KEY_REFRESH_TOKEN, { path: "/" });
-
       },
     },
   }),
 );
 
-export const useAccessToken = () => useTokenStore((state) => state.actions.getAccessToken());
-export const useRefreshToken = () => useTokenStore((state) => state.actions.getRefreshToken());
+export const useAccessToken = () =>
+  useTokenStore((state) => state.actions.getAccessToken());
+export const useRefreshToken = () =>
+  useTokenStore((state) => state.actions.getRefreshToken());
 export const useTokenActions = () => useTokenStore((state) => state.actions);

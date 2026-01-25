@@ -39,7 +39,7 @@ public class MockServiceImpl implements MockService {
                 .email("nguyenthinhphat3009@gmail.com")
                 .firstName("Phat")
                 .lastName("Nguyen")
-                .avatar("image_20250517_132027_e004037b-f8ab-4042-8c0c-6eb01223d818.jpeg")
+                .avatar(null)
                 .password(passwordEncoder.encode("phat12"))
                 .enabled(true)
                 .bio("I am a software engineer with a passion for technology and innovation." +
@@ -56,7 +56,6 @@ public class MockServiceImpl implements MockService {
                 minioClientService.uploadObject(imageBytes, "user-avatars", avatar, "image/jpeg");
             } catch (Exception e) {
                 log.error("Error when retrieving avatar URL for user: {}", email, e);
-                avatar = "https://default-avatar-url.com";
             }
 
             userService.createUser(User.builder()

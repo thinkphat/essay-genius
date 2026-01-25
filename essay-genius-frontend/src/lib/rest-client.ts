@@ -8,7 +8,7 @@ import qs from "qs";
 import { getAccessToken } from "./utils";
 
 const axiosClient = axios.create({
-  baseURL: "",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "",
 });
 
 function makeQueryClient() {
