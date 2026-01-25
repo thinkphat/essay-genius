@@ -1,11 +1,17 @@
-import { CommonReactionSchema, CreateCommentRequest, CreateCommentResponse, CreateReactionRequest, PageCommentRequest } from "@/constracts/interaction.contrast";
+import {
+  CommonReactionSchema,
+  CreateCommentRequest,
+  CreateCommentResponse,
+  CreateReactionRequest,
+  PageCommentRequest,
+} from "@/constracts/interaction.contrast";
 import { api } from "@/lib/api";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function useCommentMutation() {
   return useMutation<CreateCommentResponse, unknown, CreateCommentRequest>({
-    mutationKey: ['interaction', 'comment'],
+    mutationKey: ["interaction", "comment"],
     mutationFn: async (body) => {
       const response = await api.interaction.createComment({ body });
 
@@ -13,14 +19,14 @@ export function useCommentMutation() {
         return response.body;
       }
 
-      throw new Error('Failed to create comment');
+      throw new Error("Failed to create comment");
     },
   });
 }
 
 export function useReactionMutation() {
   return useMutation<CommonReactionSchema, unknown, CreateReactionRequest>({
-    mutationKey: ['interaction', 'reaction'],
+    mutationKey: ["interaction", "reaction"],
     mutationFn: async (body) => {
       const response = await api.interaction.createReaction({ body });
 
@@ -28,7 +34,7 @@ export function useReactionMutation() {
         return response.body;
       }
 
-      throw new Error('Failed to create reaction');
+      throw new Error("Failed to create reaction");
     },
   });
 }
@@ -56,7 +62,12 @@ export function useDeleteReactionMutation(onSuccess?: () => void) {
 
 export function useComments(params: PageCommentRequest, enabled: boolean) {
   return useInfiniteQuery({
-    queryKey: ["comments", params.essayId, params.parentId ?? null, params.createdBy ?? null],
+    queryKey: [
+      "comments",
+      params.essayId,
+      params.parentId ?? null,
+      params.createdBy ?? null,
+    ],
     queryFn: async ({ pageParam = 0 }) => {
       const { status, body } = await api.interaction.getComments({
         query: {
@@ -75,7 +86,8 @@ export function useComments(params: PageCommentRequest, enabled: boolean) {
       return body;
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.pageable.pageNumber + 1),
+    getNextPageParam: (lastPage) =>
+      lastPage.last ? undefined : lastPage.pageable.pageNumber + 1,
     enabled,
   });
 }

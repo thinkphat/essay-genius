@@ -31,7 +31,6 @@ import { z } from "zod";
 import { api } from "@/lib/api";
 import { setCookie } from "cookies-next/client";
 import { COOKIE_KEY_ACCESS_TOKEN, COOKIE_KEY_REFRESH_TOKEN } from "@/constants";
-import { useTokenStore } from "@/hooks/token-store";
 
 type FormValues = z.infer<typeof signInBodySchema>;
 
@@ -45,7 +44,7 @@ export default function SignIn() {
       password: "",
     },
   });
-  const { setAccessToken, setRefreshToken } = useTokenStore((s) => s.actions);
+
   const {
     control,
     handleSubmit,
@@ -59,9 +58,12 @@ export default function SignIn() {
       switch (response.status) {
         case 200:
           const { accessToken, refreshToken } = response.body;
-
-          setAccessToken(accessToken);
-          setRefreshToken(refreshToken);
+          setCookie(COOKIE_KEY_ACCESS_TOKEN, accessToken, {
+            httpOnly: false,
+          });
+          setCookie(COOKIE_KEY_REFRESH_TOKEN, refreshToken, {
+            httpOnly: false,
+          });
           await queryClient.invalidateQueries({ queryKey: ["current_user"] });
           toast("Login successful");
           router.push("/");

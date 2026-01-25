@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "@/lib/api";
-import { CommentSchema, CreateCommentRequest, createCommentRequestSchema, pageCommentResponseSchema, CommonReactionSchema, ReactionType } from "@/constracts/interaction.contrast";
-import { Send } from "lucide-react";
-import { FormProvider, useForm } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
-import { useCommentMutation, useDeleteReactionMutation, useReactionMutation } from "@/hooks/mutations/interaction.mutation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CommentSchema,
+  pageCommentResponseSchema,
+  CommonReactionSchema,
+  ReactionType,
+} from "@/constracts/interaction.contrast";
+import {
+  useDeleteReactionMutation,
+  useReactionMutation,
+} from "@/hooks/mutations/interaction.mutation";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ReactionButton } from "./reaction-button";
 import { ReplyInput } from "./reply-input";
@@ -23,10 +25,10 @@ interface CommentItemProps {
 
 export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
   const [reactionId, setReactionId] = useState<string | null>(
-    comment.reactedInfo?.reactionId ?? null
+    comment.reactedInfo?.reactionId ?? null,
   );
   const [currentReaction, setCurrentReaction] = useState<ReactionType | null>(
-    comment.reactedInfo?.reactionType ?? null
+    comment.reactedInfo?.reactionType ?? null,
   );
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
@@ -48,7 +50,7 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
           setCurrentReaction(type);
           toast.success("Reacted successfully");
         },
-      }
+      },
     );
   };
 
@@ -62,10 +64,9 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
     });
   };
 
-  const {
-    data: replies,
-    isLoading: loadingReplies,
-  } = useQuery<CommentSchema[]>({
+  const { data: replies, isLoading: loadingReplies } = useQuery<
+    CommentSchema[]
+  >({
     queryKey: ["comments", comment.essayId, comment.id],
     queryFn: async () => {
       const { status, body } = await api.interaction.getComments({
@@ -83,7 +84,6 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
     },
     enabled: showReplies,
   });
-
 
   return (
     <div className="space-y-2" style={{ marginLeft: depth * 16 }}>

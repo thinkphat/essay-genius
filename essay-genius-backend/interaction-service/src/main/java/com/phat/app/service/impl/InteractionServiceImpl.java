@@ -66,15 +66,22 @@ public class InteractionServiceImpl implements InteractionService {
                 .reactionCount(0)
                 .build();
 
-        ToxicCheckerResponse toxicCheckerResponse = aiGrpcClient.checkToxic(content);
+        commentRepository.save(comment);
+        CommentResponse commentResponse = commentMapper.toCommentResponse(comment);
+        commentResponse.setUser(identityServiceGrpcClient.getUserInfo(getCurrentUser()));
+        return ToxicCheckerResponse.builder().valid(true)
+                .commentResponse(commentResponse)
+                .message("")
+                .build();
+
+        /*ToxicCheckerResponse toxicCheckerResponse = aiGrpcClient.checkToxic(content);
         if (toxicCheckerResponse.isValid()){
             commentRepository.save(comment);
             CommentResponse commentResponse = commentMapper.toCommentResponse(comment);
             commentResponse.setUser(identityServiceGrpcClient.getUserInfo(getCurrentUser()));
             toxicCheckerResponse.setCommentResponse(commentResponse);
         }
-
-        return toxicCheckerResponse;
+        return toxicCheckerResponse;*/
     }
 
     @Override

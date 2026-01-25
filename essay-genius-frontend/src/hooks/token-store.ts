@@ -17,21 +17,18 @@ export const useTokenStore = create<TokenStore>(
   (set): TokenStore => ({
     accessToken: null,
     actions: {
-      setAccessToken: (accessToken) => {
+      setAccessToken: (accessToken) =>
         Cookies.set(COOKIE_KEY_ACCESS_TOKEN, accessToken, {
           path: "/",
           secure: true,
           sameSite: "Strict",
-        });
-        set({ accessToken });
-      },
-      setRefreshToken: (refreshToken) => {
-        Cookies.set(COOKIE_KEY_REFRESH_TOKEN, refreshToken, {
+        }),
+      setRefreshToken: (refereshToken) =>
+        Cookies.set(COOKIE_KEY_REFRESH_TOKEN, refereshToken, {
           path: "/",
           secure: true,
           sameSite: "Strict",
-        });
-      },
+        }),
       getAccessToken: () => Cookies.get(COOKIE_KEY_ACCESS_TOKEN),
       getRefreshToken: () => Cookies.get(COOKIE_KEY_REFRESH_TOKEN),
       clearTokens: () => {

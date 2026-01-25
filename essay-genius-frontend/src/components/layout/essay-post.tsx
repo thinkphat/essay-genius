@@ -1,15 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -17,17 +12,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, MessageSquare, Star, Send } from "lucide-react";
+import { MoreHorizontal, MessageSquare, Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EssayScoredResponse } from "@/constracts/essay.constract";
 import {
-  PageCommentRequest,
   CreateCommentRequest,
   createCommentRequestSchema,
   CreateCommentResponse,
   CommonReactionSchema,
 } from "@/constracts/interaction.contrast";
-import { api } from "@/lib/api";
 import ReactionDialog from "./reaction-dialog";
 import { CommentItem } from "./comment-item";
 import {
@@ -36,8 +29,7 @@ import {
   useDeleteReactionMutation,
   useReactionMutation,
 } from "@/hooks/mutations/interaction.mutation";
-import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ReplyInput } from "./reply-input";
@@ -136,10 +128,8 @@ export default function EssayPost({
             queryClient.invalidateQueries({
               queryKey: ["comments", essayPost.id, null, null],
             });
-            toast.success("your toxic level is " + response.message);
-          } else {
-            toast.error("Your toxic level is " + response.message);
           }
+          // toast.success("your toxic level is " + response.message);
         },
         onError: (error) => {
           toast("failed to comment");

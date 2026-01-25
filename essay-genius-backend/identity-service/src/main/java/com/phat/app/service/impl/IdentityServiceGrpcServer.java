@@ -65,15 +65,13 @@ public class IdentityServiceGrpcServer extends IdentityServiceGrpc.IdentityServi
                     .setFirstName(user.getFirstName() != null ? user.getFirstName() : "")
                     .setLastName(user.getLastName() != null ? user.getLastName() : "")
                     .setBio(user.getBio() != null ? user.getBio() : "");
-
-            String url = minioClientService.getObjectUrl("default-avatar-url.png", "user-avatars");
             try {
-                url = minioClientService.getObjectUrl(user.getAvatar(), "user-avatars");
+                String url = minioClientService.getObjectUrl(user.getAvatar(), "user-avatars");
                 log.debug("Avatar URL retrieved: {}", url);
+                responseBuilder.setAvatar(url);
             } catch (Exception e) {
                 log.error("Error when retrieving avatar URL for user: {}", user.getEmail(), e);
             }
-            responseBuilder.setAvatar(url);
             responseObserver.onNext(responseBuilder.build());
             responseObserver.onCompleted();
 

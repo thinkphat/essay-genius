@@ -17,13 +17,12 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useSignOutMutation } from "@/hooks/mutations/auth.mutation";
 import { getCookie } from "cookies-next";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { useTokenStore } from "@/hooks/token-store";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { setTheme, theme } = useTheme();
-  const accessToken = useTokenStore((s) => s.accessToken);
-  const { data: user, isLoading } = useCurrentUser(!!accessToken);
+  const accessToken = getCookie("access_token");
+  const { data: user } = useCurrentUser(!!accessToken);
   const signOut = useSignOutMutation();
   const [mounted, setMounted] = useState(false);
 
@@ -88,29 +87,31 @@ export default function Header() {
           </Button>
 
           {!mounted ? (
-            <Skeleton className="w-8 h-8 rounded-full" />
-          ) : isLoading ? (
-            <Skeleton className="w-8 h-8 rounded-full" />
+            <Skeleton className="w-10 h-10 rounded-full" />
           ) : (
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <div className="flex items-center space-x-2">
                 <DropdownMenuTrigger asChild>
                   <div className="cursor-pointer">
-                    {user?.avatar ? (
-                      <Avatar className="h-10 w-10 rounded-full">
-                        <AvatarImage
-                          src={user.avatar || "/placeholder.svg"}
-                          alt={`${user.firstName} ${user.lastName}`}
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
+                    {user ? (
+                      <Avatar className="h-10 w-10">
+                        {user.avatar ? (
+                          <AvatarImage
+                            src={user.avatar}
+                            alt={`${user.firstName} ${user.lastName}`}
+                            className="object-cover"
+                          />
+                        ) : null}
+
                         <AvatarFallback
                           className="
-                            w-10 h-10
-                            rounded-full
-                            flex items-center justify-center
-                            text-lg
-                            bg-orange-300
-                            "
+        w-10 h-10
+        rounded-full
+        flex items-center justify-center
+        text-lg
+        bg-orange-300
+        text-white
+      "
                         >
                           {user.firstName.charAt(0)}
                         </AvatarFallback>
