@@ -1,7 +1,9 @@
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { getCookie } from "cookies-next";
 
-export const useCurrentUser = (enabled: boolean) => {
+const accessToken = getCookie("access_token");
+export const useCurrentUser = () => {
   return useQuery({
     queryKey: ["current_user"],
     queryFn: async () => {
@@ -9,6 +11,6 @@ export const useCurrentUser = (enabled: boolean) => {
       if (res.status !== 200) throw new Error("Unauthorized");
       return res.body;
     },
-    enabled,
+    enabled: !!accessToken,
   });
 };

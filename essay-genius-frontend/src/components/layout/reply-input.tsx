@@ -9,7 +9,10 @@ import { useCommentMutation } from "@/hooks/mutations/interaction.mutation";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { CreateCommentRequest, createCommentRequestSchema } from "@/constracts/interaction.contrast";
+import {
+  CreateCommentRequest,
+  createCommentRequestSchema,
+} from "@/constracts/interaction.contrast";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 type ReplyInputProps = {
@@ -21,7 +24,7 @@ type ReplyInputProps = {
 export function ReplyInput({ essayId, parentId, onDone }: ReplyInputProps) {
   const [loading, setLoading] = useState(false);
 
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user } = useCurrentUser();
   const form = useForm<CreateCommentRequest>({
     resolver: zodResolver(createCommentRequestSchema),
     defaultValues: {
@@ -41,10 +44,9 @@ export function ReplyInput({ essayId, parentId, onDone }: ReplyInputProps) {
     commentMutation.mutate(data, {
       onSuccess: (response) => {
         form.reset({ ...data, content: "" });
-
-        toast[response.valid ? "success" : "error"](
-          "Your toxic level is " + response.message
-        );
+        // toast[response.valid ? "success" : "error"](
+        //   "Your toxic level is " + response.message,
+        // );
 
         queryClient.invalidateQueries({
           queryKey: ["comments", essayId, parentId],

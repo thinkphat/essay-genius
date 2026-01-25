@@ -21,8 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { setTheme, theme } = useTheme();
-  const accessToken = getCookie("access_token");
-  const { data: user } = useCurrentUser(!!accessToken);
+  const { data: user } = useCurrentUser();
   const signOut = useSignOutMutation();
   const [mounted, setMounted] = useState(false);
 
