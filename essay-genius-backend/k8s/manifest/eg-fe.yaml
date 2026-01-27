@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: eg-frontend
-          image: eg-frontend:v1
+          image: ntphat30019/essay-genius-fe:v4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000

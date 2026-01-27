@@ -13,30 +13,73 @@ spec:
       labels:
         app: eg-identity-service
     spec:
+      serviceAccountName: identity-sa
+      volumes:
+        - name: shared-config
+          emptyDir: {}
+        - name: init-config
+          configMap:
+            name: eg-identity-init-config
+      initContainers:
+        - name: preparation
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: shared-config
+              mountPath: /shared
+            - name: init-config
+              mountPath: /init
+          envFrom:
+            - configMapRef:
+                name: eg-identity-config
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Postgres..."
+              until nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do sleep 2; done
+
+              echo "Waiting for Redis..."
+              until nc -z "$REDIS_HOST" "$REDIS_PORT"; do sleep 2; done
+
+              echo "Waiting for MinIO..."
+              until nc -z "$MINIO_HOST" "$MINIO_PORT"; do sleep 2; done
+
+              echo "Waiting for Kafka..."
+              until nc -z "$KAFKA_HOST" "$KAFKA_PORT"; do sleep 2; done
+              echo "All dependencies are ready!"
+
+              echo "Preparing config for main container..."
+              cp /init/application.yml /shared/application.yml
+              echo "done!"
+
       containers:
         - name: eg-identity
           image: eg-identity-service:v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 10000
+          volumeMounts:
+            - name: shared-config
+              mountPath: /app/src/main/resources
           envFrom:
             - secretRef:
                 name: eg-identity-secrets
-            - configMapRef:
-                name: eg-grpc-config
-            - configMapRef:
-                name: eg-identity-config
+            # - configMapRef:
+            #     name: eg-grpc-config
+            # - configMapRef:
+            #     name: eg-identity-config
           env:
-            - name: LOKI_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: common-config
-                  key: LOKI_URL
-            - name: GATEWAY_PUBLIC_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: common-config
-                  key: GATEWAY_PUBLIC_URL
+            #   - name: LOKI_URL
+            #     valueFrom:
+            #       configMapKeyRef:
+            #         name: common-config
+            #         key: LOKI_URL
+            #   - name: GATEWAY_PUBLIC_URL
+            #     valueFrom:
+            #       configMapKeyRef:
+            #         name: common-config
+            #         key: GATEWAY_PUBLIC_URL
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
@@ -69,6 +112,7 @@ spec:
       targetPort: 9083
 
 ---
+#Configmap use variable style
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -80,6 +124,170 @@ data:
   POSTGRES_PORT: "5432"
   MINIO_HOST: eg-minio
   MINIO_PORT: "9000"
-  SPRING_KAFKA_BOOTSTRAP-SERVERS: "eg-kafka.essay-genius.svc.cluster.local:29092"
   REDIS_HOST: eg-redis
   REDIS_PORT: "6379"
+  KAFKA_HOST: eg-kafka.essay-genius.svc.cluster.local
+  KAFKA_PORT: "29092"
+  SPRING_KAFKA_BOOTSTRAP-SERVERS: "eg-kafka.essay-genius.svc.cluster.local:29092"
+
+---
+# Configmap use config file
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-identity-init-config
+  namespace: essay-genius
+data:
+  application.yml: |
+    server:
+      port: 10000
+      servlet:
+        context-path: /identity
+
+    spring:
+      config:
+        import:
+          - "optional:file:env.properties"
+          - "optional:file:../env.properties"
+      application:
+        name: identity-service
+      #_______________________________________DATABASE_______________________________________
+      datasource:
+        url: jdbc:postgresql://eg-postgres:5432/identity_service_db
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+        hikari:
+          maximum-pool-size: 10
+
+      jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+          ddl-auto: update
+        show-sql: true
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+            format_sql: true
+
+      messages:
+        basename: i18n/messages
+        encoding: UTF-8
+        default-locale: en
+
+      kafka:
+        bootstrap-servers: eg-kafka.essay-genius.svc.cluster.local:29092
+        consumer:
+          group-id: identity-service
+          auto-offset-reset: earliest
+          key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+        producer:
+          key-serializer: org.apache.kafka.common.serialization.StringSerializer
+          value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      data:
+        redis:
+          host: eg-redis
+          port: 6379
+
+      mail:
+        from: nguyenthinhphat3009@gmail.com
+        host: smtp.gmail.com
+        port: 587
+        verify-link: http://essay-genius.local:8889/identity/auth/verify-email-by-token
+        username: nguyenthinhphat3009@gmail.com 
+        password: ${SMTP_PASSWORD}
+        default-encoding: UTF-8
+        properties:
+          mail:
+            smtp:
+              auth: true
+              starttls:
+                enable: true
+
+    grpc:
+      server:
+        port: 9083 
+        negotiationType: plaintext
+        enableReflection: true
+        maxInboundMessageSize: 104857600 # 100MB
+        maxInboundMetadataSize: 1048576 # 1MB
+      client:
+        essay-service:
+          address: static://eg-essay-service:9082
+          negotiationType: plaintext
+
+        interaction-service:
+          address: static://eg-interaction-service:9084
+          negotiationType: plaintext
+
+    jwt:
+      accessSignerKey: ${JWT_ACCESS_SIGNER_KEY}
+      refreshSignerKey: ${JWT_REFRESH_SIGNER_KEY}
+      valid-duration: 1800 # in seconds
+      refreshable-duration: 2592000 # in seconds
+
+    minio:
+      endpoint: http://eg-minio:9000
+      access-key: ${MINIO_ACCESS_KEY}
+      secret-key: ${MINIO_SECRET_KEY}
+      bucket-name: essay-genius-bucket
+      temp-bucket-name: essay-genius-temp-bucket
+
+    #_______________________________________API DOCUMENT_______________________________________
+    springdoc:
+      api-docs:
+        enabled: true
+        path: /v3/api-docs
+      swagger-ui:
+        enabled: false
+      show-actuator: true
+
+    openapi:
+      service:
+        title: Identity Service REST API
+        description: This is the API documentation for Identity Service.
+        version: 1.0.0
+        server-description: Essay Genius Backend API service For Development
+
+    #_______________________________________MANAGEMENT_______________________________________
+    management:
+      endpoints:
+        web:
+          base-path: /actuator
+          exposure:
+            include:
+              - health
+              - info
+              - metrics
+              - prometheus
+      endpoint:
+        health:
+          show-details: always
+
+      info:
+        git:
+          enabled: true
+          mode: full
+
+      metrics:
+        distribution:
+          percentiles-histogram:
+            http:
+              server:
+                requests: true
+        tags:
+          application: ${spring.application.name}
+
+      observations:
+        key-values:
+          application: ${spring.application.name}
+
+      tracing:
+        enabled: true
+        sampling:
+          probability: 1.0
+
+    loki:
+      url: http://eg-loki.essay-genius.svc.cluster.local:3100/loki/api/v1/push
