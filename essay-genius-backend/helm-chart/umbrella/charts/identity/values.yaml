@@ -1,0 +1,311 @@
+namespace: essay-genius
+replicaCount: 1
+
+image:
+  repository: eg-identity-service
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v1"
+
+envFrom:
+  secrets:
+    - identity-secrets
+env:
+  - name: POSTGRES_USER
+    secret:
+      name: postgres-secrets
+      key: POSTGRES_USER
+
+  - name: POSTGRES_PASSWORD
+    secret:
+      name: postgres-secrets
+      key: POSTGRES_PASSWORD
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+
+initConfigMap: identity-init-config
+initContainers:
+  preparation:
+    repository: busybox
+    pullPolicy: IfNotPresent
+    tag: latest
+    envFrom:
+      configMaps:
+        - identity-config
+    command: |
+        echo "Waiting for Postgres..."
+        until nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do sleep 2; done
+
+        echo "Waiting for Redis..."
+        until nc -z "$REDIS_HOST" "$REDIS_PORT"; do sleep 2; done
+
+        echo "Waiting for MinIO..."
+        until nc -z "$MINIO_HOST" "$MINIO_PORT"; do sleep 2; done
+
+        echo "Waiting for Kafka..."
+        until nc -z "$KAFKA_HOST" "$KAFKA_PORT"; do sleep 2; done
+        echo "All dependencies are ready!"
+
+        echo "Preparing config for main container..."
+        cp /init/application.yml /shared/application.yml
+        echo "done!"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  mainPort:
+    name: http
+    port: 10000
+    targetPort: 10000
+    protocol: TCP    
+  extraPorts:
+    - name: grpc
+      protocol: TCP
+      port: 9083
+      targetPort: 9083
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+
+identityConfig:
+  FROM_MAIL: "nguyenthinhphat3009@gmail.com"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+  MINIO_HOST: "minio"
+  MINIO_PORT: "9000"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  KAFKA_HOST: "kafka.essay-genius.svc.cluster.local"
+  KAFKA_PORT: "29092"
+
+identityConfigFile: |
+  server:
+    port: 10000
+    servlet:
+      context-path: /identity
+  
+  spring:
+    config:
+      import:
+        - "optional:file:env.properties"
+        - "optional:file:../env.properties"
+    application:
+      name: identity-service
+    #_______________________________________DATABASE_______________________________________
+    datasource:
+      url: jdbc:postgresql://postgres:5432/identity_service_db
+      username: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 10
+  
+    jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          format_sql: true
+  
+    messages:
+      basename: i18n/messages
+      encoding: UTF-8
+      default-locale: en
+  
+    kafka:
+      bootstrap-servers: kafka.essay-genius.svc.cluster.local:29092
+      consumer:
+        group-id: identity-service
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    data:
+      redis:
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6379}
+  
+    mail:
+      from: nguyenthinhphat3009@gmail.com
+      host: smtp.gmail.com
+      port: 587
+      verify-link: http://essay-genius.local:8889/identity/auth/verify-email-by-token
+      username: nguyenthinhphat3009@gmail.com
+      password: ${SMTP_PASSWORD}
+      default-encoding: UTF-8
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
+  
+  grpc:
+    server:
+      port: 9083
+      negotiationType: plaintext
+      enableReflection: true
+      maxInboundMessageSize: 104857600 # 100MB
+      maxInboundMetadataSize: 1048576 # 1MB
+    client:
+      essay-service:
+        address: static://essay:9082
+        negotiationType: plaintext
+  
+      interaction-service:
+        address: static://interaction:9084
+        negotiationType: plaintext
+  
+  #logging:
+  #  level:
+  #    org.springframework: DEBUG
+  
+  jwt:
+    accessSignerKey: ${JWT_ACCESS_SIGNER_KEY}
+    refreshSignerKey: ${JWT_REFRESH_SIGNER_KEY}
+    valid-duration: 1800 # in seconds
+    refreshable-duration: 2592000 # in seconds
+  
+  minio:
+    endpoint: http://minio:9000
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket-name: essay-genius-bucket
+    temp-bucket-name: essay-genius-temp-bucket
+  
+  #_______________________________________API DOCUMENT_______________________________________
+  springdoc:
+    api-docs:
+      enabled: true
+      path: /v3/api-docs
+    swagger-ui:
+      enabled: false
+    show-actuator: true
+  
+  openapi:
+    service:
+      title: Identity Service REST API
+      description: This is the API documentation for Identity Service.
+      version: 1.0.0
+      server-description: Essay Genius Backend API service For Development
+  
+  #_______________________________________MANAGEMENT_______________________________________
+  management:
+    endpoints:
+      web:
+        base-path: /actuator
+        exposure:
+          include:
+            - health
+            - info
+            - metrics
+            - prometheus
+    endpoint:
+      health:
+        show-details: always
+  
+    info:
+      git:
+        enabled: true
+        mode: full
+  
+    metrics:
+      distribution:
+        percentiles-histogram:
+          http:
+            server:
+              requests: true
+      tags:
+        application: ${spring.application.name}
+  
+    observations:
+      key-values:
+        application: ${spring.application.name}
+  
+    tracing:
+      enabled: true
+      sampling:
+        probability: 1.0
+  
+  loki:
+    url: http://loki.essay-genius.svc.cluster.local:3100/loki/api/v1/push
+
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "identity-sa"
+rbac:
+  create: true
+  role:
+    name: pod-reader-role
+    rules:
+      - apiGroups: [""]
+        resources: ["pods"]
+        verbs: ["get", "list"]
+

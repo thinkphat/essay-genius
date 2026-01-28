@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: identity-config
+  namespace: {{ .Values.namespace }}
+data:
+  FROM_MAIL: {{ .Values.identityConfig.FROM_MAIL | quote }}
+  POSTGRES_HOST: {{ .Values.identityConfig.POSTGRES_HOST | quote }}
+  POSTGRES_PORT: {{ .Values.identityConfig.POSTGRES_PORT | quote }}
+  MINIO_HOST: {{ .Values.identityConfig.MINIO_HOST | quote }}
+  MINIO_PORT: {{ .Values.identityConfig.MINIO_PORT | quote }}
+  REDIS_HOST: {{ .Values.identityConfig.REDIS_HOST | quote }}
+  REDIS_PORT: {{ .Values.identityConfig.REDIS_PORT | quote }}
+  KAFKA_HOST: {{ .Values.identityConfig.KAFKA_HOST | quote }}
+  KAFKA_PORT: {{ .Values.identityConfig.KAFKA_PORT | quote }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: identity-init-config
+  namespace: {{ .Values.namespace }}
+data:
+  application.yml: |
+{{ .Values.identityConfigFile | nindent 4 }}

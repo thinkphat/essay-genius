@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "identity.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ include "identity.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "identity.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "identity.name" . }}
+    spec:
+{{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+{{- end }}
+      volumes:
+        - name: shared-config
+          emptyDir: {}
+        - name: init-config
+          configMap:
+            name: {{ .Values.initConfigMap }}
+
+      initContainers:
+        - name: preparation
+          image: "{{ .Values.initContainers.preparation.repository }}:{{ .Values.initContainers.preparation.tag}}"
+          imagePullPolicy: {{ .Values.initContainers.preparation.pullPolicy }}
+          volumeMounts:
+            - name: shared-config
+              mountPath: /shared
+            - name: init-config
+              mountPath: /init
+
+          envFrom:
+          {{- range .Values.initContainers.preparation.envFrom.configMaps }}
+            - configMapRef:
+                name: {{ . }}
+          {{- end }}
+
+          command:
+            - sh
+            - -c
+            - |
+{{ .Values.initContainers.preparation.command | nindent 14 }}
+
+      containers:
+        - name: identity
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - containerPort: {{ .Values.service.mainPort.port }}
+
+          volumeMounts:
+            - name: shared-config
+              mountPath: /app/src/main/resources
+
+          envFrom:
+          {{- range .Values.envFrom.secrets }}
+            - secretRef:
+                name: {{ . }}
+          {{- end }}
+
+          env:
+          {{- range .Values.env }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secret.name }}
+                  key: {{ .secret.key }}
+          {{- end }}

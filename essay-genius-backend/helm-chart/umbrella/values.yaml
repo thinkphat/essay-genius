@@ -1,0 +1,49 @@
+global:
+  environment: dev
+  imagePullPolicy: IfNotPresent
+  imageRegistry: docker.io/ntphat30019
+
+gateway:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: gateway
+    tag: latest
+  service:
+    port: 8080
+
+identity:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: identity-service
+    tag: latest
+  service:
+    port: 8081
+
+essay:
+  enabled: false
+  replicaCount: 1
+  image:
+    name: essay-service
+    tag: latest
+  service:
+    port: 8082
+
+interaction:
+  enabled: false
+  replicaCount: 1
+  image:
+    name: interaction-service
+    tag: latest
+  service:
+    port: 8083
+
+frontend:
+  enabled: false
+  replicaCount: 1
+  image:
+    name: frontend
+    tag: latest
+  service:
+    port: 3000

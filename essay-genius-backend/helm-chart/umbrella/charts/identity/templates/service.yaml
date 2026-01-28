@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "identity.fullname" . }}
+  namespace: {{ .Values.namespace}}
+  labels:
+    {{- include "identity.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.mainPort.name }}
+      port: {{ .Values.service.mainPort.port }}
+      targetPort: {{ .Values.service.mainPort.targetPort }}
+      protocol: {{ .Values.service.mainPort.protocol }}
+
+  {{- range .Values.service.extraPorts }}
+    - name: {{ .name }}
+      protocol: {{ .protocol }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+  {{- end }}
+  selector:
+    {{- include "identity.selectorLabels" . | nindent 4 }}

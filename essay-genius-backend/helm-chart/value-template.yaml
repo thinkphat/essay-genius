@@ -1,0 +1,118 @@
+# =====================================
+# Application settings
+# =====================================
+replicaCount: 1
+
+image:
+  repository: myregistry/eg-identity-service
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+# =====================================
+# Init Containers
+# =====================================
+initContainers:
+  enabled: true
+  containers:
+    - name: init-preparation
+      image: busybox:latest
+      imagePullPolicy: IfNotPresent
+      command: ["sh", "-c"]
+      args: ["echo 'Initializing...'; sleep 5"]
+      env:
+        - name: INIT_ENV
+          value: "example"
+      volumeMounts:
+        - name: shared-config
+          mountPath: /shared
+# =====================================
+# Service settings
+# =====================================
+service:
+  type: ClusterIP
+  port: 10000
+  annotations: {}
+
+# =====================================
+# Ingress settings
+# =====================================
+ingress:
+  enabled: true
+  className: nginx
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: eg-identity.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: eg-identity-tls
+      hosts:
+        - eg-identity.example.com
+
+# =====================================
+# Resources (CPU/memory)
+# =====================================
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# =====================================
+# Autoscaling
+# =====================================
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+
+# =====================================
+# Node / Pod scheduling
+# =====================================
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# =====================================
+# Environment variables
+# =====================================
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "dev"
+  - name: LOKI_URL
+    value: "http://loki:3100"
+
+# =====================================
+# ConfigMap and Secrets
+# =====================================
+config:
+  exampleKey: exampleValue
+
+secrets:
+  exampleSecret: secretValue
+
+# =====================================
+# Persistence
+# =====================================
+persistence:
+  enabled: false
+  storageClass: standard
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+# =====================================
+# Optional features / integrations
+# =====================================
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: identity-sa
+  name: eg-identity-sa
   namespace: essay-genius
 
 ---
@@ -23,7 +23,7 @@ metadata:
   namespace: essay-genius
 subjects:
   - kind: ServiceAccount
-    name: identity-sa
+    name: eg-identity-sa
     namespace: essay-genius
 roleRef:
   kind: Role
