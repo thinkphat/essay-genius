@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-identity-config
+  namespace: {{ .Values.namespace }}
+data:
+{{- range $key, $value := .Values.identityConfig }} 
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eg-identity-init-config
+  namespace: {{ .Values.namespace }}
+data:
+  application.yml: |
+{{ .Values.identityConfigFile | nindent 4 }}

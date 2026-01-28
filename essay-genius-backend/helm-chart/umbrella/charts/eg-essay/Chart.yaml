@@ -1,0 +1,7 @@
+apiVersion: v2
+name: eg-essay
+description: Essay service for Essay Genius system
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+

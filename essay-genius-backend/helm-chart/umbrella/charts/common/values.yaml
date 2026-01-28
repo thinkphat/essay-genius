@@ -1,0 +1,20 @@
+commonConfigNameOverride: ""
+commonConfig:
+  ESSAY_GENIUS_URL: "http://essay-genius.local"
+  LOKI_URL: "http://eg-loki.essay-genius.svc.cluster.local:3100/loki/api/v1/push"
+  IDENTITY_SERVICE_URL: "http://essay-genius-eg-identity.essay-genius.svc.cluster.local:10000"
+  ESSAY_SERVICE_URL: "http://essay-genius-eg-essay.essay-genius.svc.cluster.local:10002"
+  INTERACTION_SERVICE_URL: "http://essay-genius-eg-interaction.essay-genius.svc.cluster.local:10003"
+  MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: "http://tempo:9411"
+  GATEWAY_PUBLIC_URL: "http://essay-genius.local:8889"
+
+grpcConfigNameOverride: ""
+grpcConfig:
+  GRPC_IDENTITY_SERVICE_HOST: essay-genius-eg-identity
+  GRPC_IDENTITY_SERVICE_PORT: "9083"
+  GRPC_ESSAY_SERVICE_HOST: essay-genius-eg-essay
+  GRPC_ESSAY_SERVICE_PORT: "9082"
+  GRPC_INTERACTION_SERVICE_HOST: essay-genius-eg-interaction
+  GRPC_INTERACTION_SERVICE_PORT: "9084"
+  GRPC_AI_SERVICE_HOST: essay-genius-eg-ai
+  GRPC_AI_SERVICE_PORT: "9081"

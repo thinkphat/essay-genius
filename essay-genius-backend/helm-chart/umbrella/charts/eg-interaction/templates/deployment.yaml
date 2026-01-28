@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eg-interaction.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "eg-interaction.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "eg-interaction.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.ports.http }}
+
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.envFrom.grpcConfig }}
+            - secretRef:
+                name: {{ .Values.envFrom.mongoSecret}}
+            - secretRef:
+                name: {{ .Values.envFrom.identitySecret}}
+
+          env:
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.env.commonConfig }}
+                  key: LOKI_URL
+            
+            - name: MONGODB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.env.mongoConfig }}
+                  key: INTERACTION_MONGODB_HOST

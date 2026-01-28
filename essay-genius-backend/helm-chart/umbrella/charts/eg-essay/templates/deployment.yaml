@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eg-essay.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "eg-essay.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "eg-essay.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.ports.http }}
+
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.envFrom.grpcConfig }}
+            - secretRef:
+                name: {{ .Values.envFrom.mongoSecret }}
+            - secretRef:
+                name: {{ .Values.envFrom.identitySecret }}
+
+          env:
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.env.commonConfig }}
+                  key: LOKI_URL
+
+            - name: MONGODB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.env.mongoConfig }}
+                  key: ESSAY_MONGODB_HOST
+

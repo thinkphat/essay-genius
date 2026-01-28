@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eg-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "eg-gateway.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "eg-gateway.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "eg-gateway.name" . }}
+    spec:
+      containers:
+        - name: eg-gateway
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+          {{- range $name, $key := .Values.env.keys }}
+            - name: {{ $name }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Values.env.configMapName }}
+                  key: {{ $key }}
+          {{- end }}
+

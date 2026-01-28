@@ -1,0 +1,74 @@
+global:
+  environment: dev
+  imagePullPolicy: IfNotPresent
+  imageRegistry: docker.io/ntphat30019
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: essay-genius.local
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: essay-genius-eg-frontend
+          servicePort: 80
+    - host: api.essay-genius.local
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: essay-genius-eg-gateway
+          servicePort: 9050
+  tls: []
+
+common:
+  enabled: true
+
+eg-gateway:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: eg-gateway
+    tag: v1
+  service:
+    port: 9050
+
+eg-identity:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: eg-identity-service
+    tag: v1
+  service:
+    port: 10000
+
+eg-essay:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: eg-essay-service
+    tag: v1
+  service:
+    port: 10002
+
+eg-interaction:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: eg-interaction-service
+    tag: v1
+  service:
+    port: 10003
+
+eg-frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    name: ntphat30019/essay-genius-fe
+    tag: v4
+  service:
+    port: 3000
+
+

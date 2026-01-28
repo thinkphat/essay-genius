@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: ntphat30019/essay-genius-fe
+  tag: v4
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: essay-genius.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.commonConfigNameOverride | default "common-config" }}
+  namespace: {{ .Release.Namespace}}
+data:
+{{- range $key, $value := .Values.commonConfig }} 
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.grpcConfigNameOverride | default "grpc-config" }}
+  namespace: {{ .Release.Namespace}}
+data:
+{{- range $key, $value := .Values.grpcConfig }}
+  {{ $key }}: {{ $value | quote}}
+{{- end }}
