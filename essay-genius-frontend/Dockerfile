@@ -4,11 +4,13 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
-
 # =============================
 
 FROM node:18.19-alpine AS builder
 WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -17,7 +19,6 @@ RUN --mount=type=cache,target=/app/.next/cache \
     npm run build
 
 # =============================
-
 FROM node:20-alpine AS runner
 WORKDIR /app
 
